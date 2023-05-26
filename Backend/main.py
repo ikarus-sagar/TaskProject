@@ -3,16 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from hashing import Hash
 from pymongo import MongoClient
 from bson import ObjectId
-import loggingcd 
+import logging
 from models import UserIn, UserOut, BlogIn, BlogOut
 from typing import List
+from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-client = MongoClient("mongodb+srv://ikarus-sagar:SagarIkarus@cluster-1.yntllpq.mongodb.net/")
+MONGODB_URL = load_dotenv("MONGODB_URL")
+
+client = MongoClient(MONGODB_URL)
 db = client["blog"]
 collection1 = db["users"]
 collection2 = db["blogs"]
