@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+passlib
+bcrypt
+pymongo[srv]
+loguru
+motor
