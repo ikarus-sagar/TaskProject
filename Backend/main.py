@@ -1,5 +1,4 @@
 from fastapi import FastAPI , Depends , HTTPException , status
-from fastapi.middleware.cors import CORSMiddleware
 from hashing import Hash
 from pymongo import MongoClient
 from bson import ObjectId
@@ -8,7 +7,6 @@ from models import UserIn, UserOut, BlogIn, BlogOut
 from typing import List
 from dotenv import load_dotenv
 import os
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -16,7 +14,6 @@ app = FastAPI()
 
 load_dotenv()
 MONGODB_URL = os.getenv("MONGODB_URL")
-
 client = MongoClient(MONGODB_URL)
 db = client["blog"]
 collection1 = db["users"]
@@ -25,19 +22,6 @@ collection2 = db["blogs"]
 async def get_db():
     db = client["blog"]
     yield db
-
-origins = [
-    "http://localhost:3000",
-    "localhost:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/")
 async def root():
@@ -48,6 +32,7 @@ async def root():
 async def create_user(user: UserIn, db: MongoClient = Depends(get_db)):
     logger.info("Creating user")
     user = user.dict()
+    
     user["id"] = str(ObjectId())
     user["password"] = Hash.bcrypt(user["password"])
     collection1.insert_one(user)
