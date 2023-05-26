@@ -7,13 +7,15 @@ import logging
 from models import UserIn, UserOut, BlogIn, BlogOut
 from typing import List
 from dotenv import load_dotenv
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-MONGODB_URL = load_dotenv("MONGODB_URL")
+load_dotenv()
+MONGODB_URL = os.getenv("MONGODB_URL")
 
 client = MongoClient(MONGODB_URL)
 db = client["blog"]
@@ -48,8 +50,7 @@ async def create_user(user: UserIn, db: MongoClient = Depends(get_db)):
     user = user.dict()
     user["id"] = str(ObjectId())
     user["password"] = Hash.bcrypt(user["password"])
-    user_id = collection1.insert_one(user)
-    user = collection1.find_one({"_id": user_id.inserted_id})
+    collection1.insert_one(user)
     return user
 
 @app.get("/user", response_model=List[UserOut] , tags=["users"])
@@ -88,8 +89,7 @@ async def create_blog(blog: BlogIn, db: MongoClient = Depends(get_db)):
     logger.info("Creating blog")
     blog = blog.dict()
     blog["id"] = str(ObjectId())
-    blog_id = collection2.insert_one(blog)
-    blog = collection2.find_one({"_id": blog_id.inserted_id})
+    collection2.insert_one(blog)
     return blog
 
 @app.get("/blog", response_model=List[BlogOut] , tags=["blogs"])
