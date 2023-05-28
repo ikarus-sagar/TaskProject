@@ -7,10 +7,15 @@ from models import UserIn, UserOut, BlogIn, BlogOut
 from typing import List
 from dotenv import load_dotenv
 import os
+
+from fastapi.staticfiles import StaticFiles
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
 
 load_dotenv()
 MONGODB_URL = os.getenv("MONGODB_URL")
@@ -22,10 +27,6 @@ collection2 = db["blogs"]
 def get_db():
     db = client["blog"]
     yield db
-
-@app.get("/")
-def root():
-    return {"message": "Hello World"}
 
 
 @app.post("/user", response_model=UserOut , status_code=status.HTTP_201_CREATED , tags=["users"])
@@ -108,3 +109,5 @@ def update_blog(blog_id: str, blog: BlogIn, db: MongoClient = Depends(get_db)):
     if blog:
         return blog
     raise HTTPException(status_code=404, detail="Blog not found")
+
+app.mount("/", StaticFiles(directory="frontend/build" , html=True) , name="frontend")

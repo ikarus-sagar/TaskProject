@@ -1,0 +1,52 @@
+.App{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #fefefe;
+    color: black;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    overflow: hidden;
+}
+
+.main{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    margin: 0.2rem;
+}
+
+.heads{
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1rem;
+    border-bottom: 1px solid black;
+    padding: 0.5rem;
+}
+
+.content{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow: hidden;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.5rem 0.1rem #888888;
+    margin: 0.2rem;
+    padding: 1rem;
+}
+
+.content div{
+    margin: 0.5rem;
+    font-size: 1.5rem;
+    height: 2rem;
+}
