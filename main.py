@@ -108,4 +108,5 @@ def update_blog(blog_id: str, blog: BlogIn, db: MongoClient = Depends(get_db)):
         return blog
     raise HTTPException(status_code=404, detail="Blog not found")
 
+
 app.mount("/", StaticFiles(directory="frontend/build" , html=True) , name="frontend")

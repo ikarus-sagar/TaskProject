@@ -6,3 +6,5 @@ pymongo[srv]
 loguru
 motor
 python-dotenv
+pytest
+pytest-asyncio

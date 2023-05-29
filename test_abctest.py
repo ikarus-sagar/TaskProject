@@ -1,6 +1,4 @@
-import pytest
 from main import UserIn,BlogIn ,logger ,create_user ,get_users ,get_user ,delete_user ,update_user ,create_blog ,get_blogs ,get_blog ,delete_blog ,update_blog 
-
 
 def test_user():
     user = UserIn(
