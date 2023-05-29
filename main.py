@@ -27,7 +27,7 @@ def get_db():
     yield db
 
 
-@app.post("/user", response_model=UserOut , status_code=status.HTTP_201_CREATED , tags=["users"])
+@app.post("/user", response_model=UserOut , tags=["users"])
 def create_user(user: UserIn, db: MongoClient = Depends(get_db)):
     logger.info("Creating user")
     user = user.dict()
