@@ -4,8 +4,12 @@
         "-s",
         ".",
         "-p",
-        "*test.py"
+        "*test.py",
+        "test*.py",
+        "test_*.py",
+        "*_test.py"
     ],
     "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true
+    "python.testing.unittestEnabled": true,
+    "python.analysis.typeCheckingMode": "off"
 }

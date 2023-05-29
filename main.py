@@ -2,25 +2,23 @@ from fastapi import FastAPI , Depends , HTTPException , status
 from hashing import Hash
 from pymongo import MongoClient
 from bson import ObjectId
-import logging
 from models import UserIn, UserOut, BlogIn, BlogOut
 from typing import List
 from dotenv import load_dotenv
+import logging
 import os
 
 from fastapi.staticfiles import StaticFiles
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-
 load_dotenv()
 MONGODB_URL = os.getenv("MONGODB_URL")
 client = MongoClient(MONGODB_URL)
-db = client["blog"]
+db = client["blogging"]
 collection1 = db["users"]
 collection2 = db["blogs"]
 
