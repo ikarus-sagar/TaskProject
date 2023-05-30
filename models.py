@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional
 class Blog(BaseModel):
     id: str
     title: str
@@ -18,6 +17,7 @@ class UserIn(BaseModel):
     password: str
     class Config:
         orm_mode = True
+
 
 class UserOut(BaseModel):
     id: str
