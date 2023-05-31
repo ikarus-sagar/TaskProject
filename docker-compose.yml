@@ -4,8 +4,10 @@ services:
     build: .
     ports:
       - 8000:8000
+    env_file:
+      - ./config/secrets.yml
     environment:
-      - MONGODB_URL=mongodb+srv://ikarus-sagar:SagarIkarus@cluster-1.yntllpq.mongodb.net/
+      - MONGODB_URL=${MONGODB_DATABASE}
   tests:
     build: .
     command: python -m pytest
