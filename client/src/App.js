@@ -2,34 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'xyz@gss',
-      password: 'sdasd'
-    },
-    {
-      id: 2,
-      name: 'John Doe',
-      email: 'xyz@gss',
-      password: 'sdasd'
-    }
-  ]);
-  const [blogs, setBlogs] = useState([
-    {
-      id: 1,
-      title: 'Blog 1',
-      content: 'Content 1',
-      creator: 'John Doe'
-    },
-    {
-      id: 2,
-      title: 'Blog 2',
-      content: 'Content 2',
-      creator: 'John Doe'
-    }
-  ]);
+  const [users, setUsers] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [showUserForm, setShowUserForm] = useState(false);
   const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -134,7 +108,11 @@ function App() {
     })
       .then(response => response.json())
       .then(data => {
-        setBlogs([...blogs, data]);
+        setBlogs([...blogs,  {
+          "title" : title,
+          "content" : content,
+          "creator" : creator,
+        }]);
         document.getElementById('title').value = '';
         document.getElementById('content').value = '';
         document.getElementById('creator').value = '';
