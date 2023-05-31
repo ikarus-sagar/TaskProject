@@ -8,6 +8,6 @@ services:
       - MONGODB_URL=mongodb+srv://ikarus-sagar:SagarIkarus@cluster-1.yntllpq.mongodb.net/
   tests:
     build: .
-    command: pytest
+    command: python -m pytest
     depends_on:
       - app

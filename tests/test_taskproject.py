@@ -1,4 +1,9 @@
-from main import UserIn, BlogIn, logger, create_user, get_user, delete_user, update_user, create_blog, get_blog, delete_blog, update_blog, get_users, get_blogs, HTTPException, status
+from models.blog_models import BlogIn
+from models.user_models import UserIn
+from routes.blog_routes import *
+from routes.user_routes import *
+from config.logging import logger
+from fastapi import HTTPException, status
 
 
 def test_user():

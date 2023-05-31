@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 
-
 const mongodburl = process.env.MONGODB_URL+"blogging";
 const mongoose = require('mongoose');
 
