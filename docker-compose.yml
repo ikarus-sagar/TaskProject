@@ -8,8 +8,12 @@ services:
       - ./config/secrets.yml
     environment:
       - MONGODB_URL=${MONGODB_DATABASE}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - tests
   tests:
     build: .
     command: python -m pytest
-    depends_on:
-      - app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
