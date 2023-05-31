@@ -3,4 +3,5 @@ venv
 .env
 data
 node_modules
+*.yml
 ```

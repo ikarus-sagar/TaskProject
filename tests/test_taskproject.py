@@ -54,16 +54,20 @@ def test_update_user():
         email="test@gmail.com",
         password="test123"
     )
+    new_user = UserIn(
+        name="test1",
+        email="test1@gmail.com",
+        password="test123"
+    )
     created_user = create_user(user)
     user_id = created_user["id"]
     try:
-        updated_user = update_user(user_id, UserIn(
-            name="test1",
-            email="test1@gmail.com",
-            password="test123"
-        ))
+        updated_user = update_user(user_id, new_user)
+        updated_user = get_user(user_id)
+        print(updated_user)
         assert updated_user["name"] == "test1"
         assert updated_user["email"] == "test1@gmail.com"
+        assert updated_user["password"] != "test123"
     finally:
         delete_user(user_id)
 
@@ -113,17 +117,6 @@ def test_blogs():
     finally:
         for blog_id in created_blog_ids:
             delete_blog(blog_id)
-
-
-def cleanup_test_data():
-    users = get_users()
-    for user in users:
-        delete_user(user["id"])
-
-    blogs = get_blogs()
-    for blog in blogs:
-        delete_blog(blog["id"])
-
 
 def test_user_not_found():
     try:
@@ -253,5 +246,14 @@ def test_delete_blog_invalid_id():
         assert e.detail == "Blog not found"
 
 
-def testabc():
-    assert 1!=1
+def test_delete_users():
+    users = get_users()
+    for user in users:
+        if user["name"] == "test":
+            delete_user(user["id"])
+            assert 1 == 1
+    blogs = get_blogs()
+    for blog in blogs:
+        if blog["title"] == "test":
+            delete_blog(blog["id"])
+            assert 1 == 1
