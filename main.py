@@ -5,13 +5,10 @@ from bson import ObjectId
 from models.user_models import UserIn, UserOut
 from models.blog_models import BlogIn, BlogOut
 from typing import List
-import logging
 from config.secrets_parser import *
-
+from config.logging import logger
 from fastapi.staticfiles import StaticFiles
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
