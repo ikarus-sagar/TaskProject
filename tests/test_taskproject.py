@@ -262,6 +262,3 @@ def test_delete_users():
         if blog["title"] == "test":
             delete_blog(blog["id"])
             assert 1 == 1
-
-def test_fail():
-    assert 1 != 1
