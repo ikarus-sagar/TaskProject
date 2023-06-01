@@ -7,3 +7,13 @@ pytest
 pyYAML
 docker-compose==1.29.2
 coverage
+
+# 
+
+pylint
+flake8
+mypy
+bandit
+safety
+black
+pydocstyle
