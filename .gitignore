@@ -43,6 +43,8 @@ Thumbs.db
 *.db
 *.sqlite
 
+
+
 # # Ignore YAML configuration files
 # *.yml
 
