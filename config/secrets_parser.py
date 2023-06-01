@@ -12,7 +12,7 @@ mongodb_host = secrets['mongodb']['host']
 mongodb_port = secrets['mongodb']['port']
 mongodb_username = secrets['mongodb']['username']
 mongodb_password = secrets['mongodb']['password']
-mongodb_database = secrets['mongodb']['database']
+mongodb_database = secrets['mongodb']['database'].replace('.', '_')
 
 def get_database():
     client = pymongo.MongoClient(mongodb_host, mongodb_port)
