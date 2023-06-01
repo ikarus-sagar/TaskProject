@@ -51,5 +51,7 @@ def update_user(user_id: str, user: UserIn, db: MongoClient = Depends(get_databa
     user_data["password"] = Hash.bcrypt(user_data["password"])
     user = users_collection.find_one_and_update({"id": user_id}, {"$set": user_data}, return_document=True)
     if user:
-        return user["id"]
+        return {
+            "id": user["id"]
+        }
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
