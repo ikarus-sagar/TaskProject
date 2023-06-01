@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
-from routes.blog_routes import *
-from routes.user_routes import *
+from routes.blog_routes import create_blog_route, delete_blog_route
+from routes.user_routes import create_user_route, delete_user_route
 from models.blog_models import BlogIn
 from models.user_models import UserIn
 
@@ -10,14 +10,14 @@ def test_create_duplicate_user():
         email="test@gmail.com",
         password="test123"
     )
-    created_user = create_user(user)
+    created_user = create_user_route(user)
     try:
-        create_user(user)
+        create_user_route(user)
     except HTTPException as e:
         assert e.status_code == status.HTTP_400_BAD_REQUEST
         assert e.detail == "User with the same email already exists"
     finally:
-        delete_user(created_user["id"])
+        delete_user_route(created_user["id"])
 
 
 def test_create_duplicate_blog():
@@ -26,11 +26,11 @@ def test_create_duplicate_blog():
         content="test",
         creator="test"
     )
-    created_blog = create_blog(blog)
+    created_blog = create_blog_route(blog)
     try:
-        create_blog(blog)
+        create_blog_route(blog)
     except HTTPException as e:
         assert e.status_code == status.HTTP_400_BAD_REQUEST
         assert e.detail == "Blog with the same title already exists"
     finally:
-        delete_blog(created_blog["id"])
+        delete_blog_route(created_blog["id"])
