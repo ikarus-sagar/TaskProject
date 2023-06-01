@@ -1,4 +1,4 @@
-name: Build and Package
+name: Flow CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-package:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -27,20 +27,24 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run -m pytest
-          COVERAGE_PERCENTAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | tr -d '%')
 
-          if [ $COVERAGE_PERCENTAGE -gt 80 ]; then
-            echo "Coverage is above 80%. Creating package with increased version number."
-            CURRENT_VERSION=$(cat version.txt)
-            VERSION_PARTS=(${CURRENT_VERSION//./ })
-            NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((${VERSION_PARTS[2]} + 1))"
-            echo "New Package Version: $NEW_VERSION"
+      - name: Generate coverage report
+        run: coverage report --fail-under=80
 
-            # Update version.txt file with the new version
-            echo "$NEW_VERSION" > version.txt
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage/html
 
-            # Build the package
-            python main.py sdist bdist_wheel
-          else
-            echo "Coverage is below 80%. Skipping package creation."
-          fi
+      - name: Build and package application
+        run: |
+          python maion.py sdist bdist_wheel
+
+      - name: Upload package
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: dist
+
+      
