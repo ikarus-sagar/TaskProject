@@ -23,9 +23,9 @@ jobs:
       - name: Static Code Analysis
         run: |
           pip install pylint flake8 mypy
-          pylint your_module.py
-          flake8 your_module.py
-          mypy your_module.py
+          pylint main.py
+          flake8 main.py
+          mypy main.py
 
       - name: Unit Tests
         run: coverage run -m pytest
@@ -36,7 +36,7 @@ jobs:
       - name: Security Checks
         run: |
           pip install bandit safety
-          bandit -r your_module.py
+          bandit -r main.py
           safety check
 
       - name: Dependency Updates
@@ -44,12 +44,12 @@ jobs:
 
       - name: Code Formatting
         run: pip install black
-             black your_module.py --check
+             black main.py --check
 
       - name: Documentation Checks
         run: |
           pip install pydocstyle
-          pydocstyle your_module.py
+          pydocstyle main.py
 
       - name: Code Review
         # Set up a step for code review process, e.g., using pull-request-review action
