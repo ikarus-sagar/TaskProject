@@ -40,7 +40,7 @@ jobs:
             echo "$NEW_VERSION" > version.txt
 
             # Build the package
-            python setup.py sdist bdist_wheel
+            python main.py sdist bdist_wheel
           else
             echo "Coverage is below 80%. Skipping package creation."
           fi
