@@ -43,11 +43,11 @@ Thumbs.db
 *.db
 *.sqlite
 
-# Ignore YAML configuration files
-*.yml
+# # Ignore YAML configuration files
+# *.yml
 
-# Ignore sensitive or personal files
-secrets.yml
+# # Ignore sensitive or personal files
+# secrets.yml
 
 # Ignore any other custom entries specific to your project
 
