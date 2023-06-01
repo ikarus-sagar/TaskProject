@@ -1,3 +1,7 @@
+'''
+    This is the main file for the FastAPI server.
+'''
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from routes import blog_routes, user_routes
