@@ -39,7 +39,7 @@ jobs:
 
       - name: Build and package application
         run: |
-          python maion.py sdist bdist_wheel
+          python main.py sdist bdist_wheel
 
       - name: Upload package
         uses: actions/upload-artifact@v2
