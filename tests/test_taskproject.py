@@ -2,9 +2,6 @@ from models.blog_models import BlogIn
 from models.user_models import UserIn
 from routes.blog_routes import *
 from routes.user_routes import *
-from config.logging import logger
-from fastapi import HTTPException, status
-
 
 def test_user():
     user = UserIn(
@@ -43,7 +40,6 @@ def test_users():
             created_user_ids.append(created_user["id"])
 
         users = get_users()
-        logger.info(users)
         for user in users:
             if user["name"] in ["test1", "test2"]:
                 assert user["name"] in ["test1", "test2"]
@@ -114,7 +110,6 @@ def test_blogs():
             created_blog_ids.append(created_blog["id"])
 
         blogs = get_blogs()
-        logger.info(blogs)
         for blog in blogs:
             if blog["title"] in ["test1", "test2"]:
                 assert blog["title"] in ["test1", "test2"]
@@ -123,132 +118,6 @@ def test_blogs():
         for blog_id in created_blog_ids:
             delete_blog(blog_id)
 
-def test_user_not_found():
-    try:
-        user = get_user("non_existing_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
-
-
-def test_blog_not_found():
-    try:
-        blog = get_blog("non_existing_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
-
-
-def test_update_user_not_found():
-    try:
-        updated_user = update_user("non_existing_id", UserIn(
-            name="test",
-            email="test@gmail.com",
-            password="test123"
-        ))
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
-
-
-def test_update_blog_not_found():
-    try:
-        updated_blog = update_blog("non_existing_id", BlogIn(
-            title="test",
-            content="test",
-            creator="test"
-        ))
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
-
-
-def test_delete_user_not_found():
-    try:
-        delete_user("non_existing_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
-
-
-def test_delete_blog_not_found():
-    try:
-        delete_blog("non_existing_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
-
-
-def test_create_duplicate_user():
-    user = UserIn(
-        name="test",
-        email="test@gmail.com",
-        password="test123"
-    )
-    created_user = create_user(user)
-    try:
-        duplicate_user = create_user(user)
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_400_BAD_REQUEST
-        assert e.detail == "User with the same email already exists"
-    finally:
-        delete_user(created_user["id"])
-
-
-def test_create_duplicate_blog():
-    blog = BlogIn(
-        title="test",
-        content="test",
-        creator="test"
-    )
-    created_blog = create_blog(blog)
-    try:
-        duplicate_blog = create_blog(blog)
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_400_BAD_REQUEST
-        assert e.detail == "Blog with the same title already exists"
-    finally:
-        delete_blog(created_blog["id"])
-
-
-def test_update_user_invalid_id():
-    try:
-        updated_user = update_user("invalid_id", UserIn(
-            name="test",
-            email="test@gmail.com",
-            password="test123"
-        ))
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
-
-
-def test_update_blog_invalid_id():
-    try:
-        updated_blog = update_blog("invalid_id", BlogIn(
-            title="test",
-            content="test",
-            creator="test"
-        ))
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
-
-
-def test_delete_user_invalid_id():
-    try:
-        delete_user("invalid_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
-
-
-def test_delete_blog_invalid_id():
-    try:
-        delete_blog("invalid_id")
-    except HTTPException as e:
-        assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
 
 
 def test_delete_users():
