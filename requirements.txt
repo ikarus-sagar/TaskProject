@@ -5,13 +5,10 @@ types-passlib
 bcrypt
 pymongo[srv]
 pytest
-pyYAML
-types-pyYAML
+pyyaml
+types-pyyaml
 docker-compose==1.29.2
 coverage
-
-# 
-
 pylint
 flake8
 mypy
