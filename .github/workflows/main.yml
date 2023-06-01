@@ -50,9 +50,3 @@ jobs:
         run: |
           pip install pydocstyle
           pydocstyle main.py
-
-      - name: Code Review
-        # Set up a step for code review process, e.g., using pull-request-review action
-
-      - name: Continuous Deployment
-        # Set up a step for deployment, e.g., using deployment action
