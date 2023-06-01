@@ -27,7 +27,7 @@ jobs:
           flake8 main.py
           mypy main.py
 
-      - name: Unit Tests
+      - name: Tests
         run: coverage run -m pytest
 
       - name: Coverage Report

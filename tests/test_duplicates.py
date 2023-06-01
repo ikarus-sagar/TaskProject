@@ -1,10 +1,8 @@
 from fastapi import HTTPException, status
-from routes.blog_routes import *
-from routes.user_routes import *
+from routes.blog_routes import create_blog_route, delete_blog_route
+from routes.user_routes import create_user_route, delete_user_route
 from models.blog_models import BlogIn
 from models.user_models import UserIn
-from config.secrets_parser import get_database
-import pytest
 
 def test_create_duplicate_user():
     user = UserIn(
@@ -12,14 +10,14 @@ def test_create_duplicate_user():
         email="test@gmail.com",
         password="test123"
     )
-    created_user = create_user(user, get_database())
+    created_user = create_user_route(user)
     try:
-        with pytest.raises(HTTPException) as e:
-            create_user(user, get_database())
-        assert e.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert e.value.detail == "User with the same email already exists"
+        create_user_route(user)
+    except HTTPException as e:
+        assert e.status_code == status.HTTP_400_BAD_REQUEST
+        assert e.detail == "User with the same email already exists"
     finally:
-        delete_user(created_user["id"], get_database())
+        delete_user_route(created_user["id"])
 
 
 def test_create_duplicate_blog():
@@ -28,11 +26,11 @@ def test_create_duplicate_blog():
         content="test",
         creator="test"
     )
-    created_blog = create_blog(blog, get_database())
+    created_blog = create_blog_route(blog)
     try:
-        with pytest.raises(HTTPException) as e:
-            create_blog(blog, get_database())
-        assert e.value.status_code == status.HTTP_400_BAD_REQUEST
-        assert e.value.detail == "Blog with the same title already exists"
+        create_blog_route(blog)
+    except HTTPException as e:
+        assert e.status_code == status.HTTP_400_BAD_REQUEST
+        assert e.detail == "Blog with the same title already exists"
     finally:
-        delete_blog(created_blog["id"], get_database())
+        delete_blog_route(created_blog["id"])
