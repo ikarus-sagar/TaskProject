@@ -5,33 +5,48 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          submodules: true
 
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: 3.x
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run tests with coverage
+      - name: Static Code Analysis
         run: |
-          coverage run -m pytest
+          pip install pylint flake8 mypy
+          pylint main.py
+          flake8 main.py
+          mypy main.py
 
-      - name: Generate coverage report
+      - name: Tests
+        run: coverage run -m pytest
+
+      - name: Coverage Report
         run: coverage report --fail-under=80
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-report
-          path: coverage/html
-    
+      - name: Security Checks
+        run: |
+          pip install bandit safety
+          bandit -r main.py
+          safety check
+
+      - name: Dependency Updates
+        run: pip install -U -r requirements.txt
+
+      - name: Code Formatting
+        run: pip install black
+             black main.py --check
+
+      - name: Documentation Checks
+        run: |
+          pip install pydocstyle
+          pydocstyle main.py
