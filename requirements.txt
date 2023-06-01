@@ -7,4 +7,3 @@ pytest
 pyYAML
 docker-compose==1.29.2
 coverage
-```
