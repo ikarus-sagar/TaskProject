@@ -56,7 +56,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Docker login
-        run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+        run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
       - name: Build Docker image
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
