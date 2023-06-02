@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
 
 env:
-  ECR_REGISTRY: <ECR_REGISTRY>
-  ECR_REPOSITORY: <ECR_REPOSITORY>
-  AWS_REGION: <AWS_REGION>
+  ECR_REGISTRY: "822546254290.dkr.ecr.us-west-1.amazonaws.com/taskproject"
+  ECR_REPOSITORY: "taskproject"
+  AWS_REGION: "us-west-1"
 
 jobs:
   build-and-publish:
