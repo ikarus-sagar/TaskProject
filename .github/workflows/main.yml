@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,6 +45,32 @@ jobs:
       - name: Generate coverage report
         run: coverage report --fail-under=80
 
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Create virtual environment
+        run: python -m venv venv
+
+      - name: Activate virtual environment
+        run: source venv/bin/activate
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Install Docker
         uses: docker/setup-buildx-action@v1
 
@@ -62,17 +88,13 @@ jobs:
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
 
       - name: Tag Docker image
-        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Push Docker image
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
           name: package
           path: dist
-      - name: Update ECS task definition
-        run: |
-          aws ecs register-task-definition --family Task_def --cli-input-json your-new-container-definition.JSON --region ${{ env.AWS_REGION }}
-        
