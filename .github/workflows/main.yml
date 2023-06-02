@@ -68,6 +68,7 @@ jobs:
 
       - name: Build Docker image
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+        working-directory: path/to/Dockerfile
 
       - name: Tag Docker image
         run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
