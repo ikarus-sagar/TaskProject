@@ -86,9 +86,10 @@ jobs:
                     "hostPort": 8000,
                     "protocol": "tcp"
                   }
-                ]
+                ],
+                "memory": 512
               }
             ]
-          }' 
+          }'          
           --region ${{ env.AWS_REGION }}
         
