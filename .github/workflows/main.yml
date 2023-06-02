@@ -74,7 +74,21 @@ jobs:
           path: dist
       - name: Update ECS task definition
         run: |
-          aws ecs register-task-definition --family Task_def \
-            --cli-input-json your-new-container-definition.json \
-            --region ${{ env.AWS_REGION }}
+          aws ecs register-task-definition --family Task_def --cli-input-json '{
+            "family": "TaskProject",
+            "containerDefinitions": [
+              {
+                "name": "taskproject-container",
+                "image": "822546254290.dkr.ecr.us-west-1.amazonaws.com/taskproject:latest",
+                "portMappings": [
+                  {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                  }
+                ]
+              }
+            ]
+          }' 
+          --region ${{ env.AWS_REGION }}
         
