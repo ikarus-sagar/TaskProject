@@ -67,8 +67,7 @@ jobs:
         run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
       - name: Build Docker image
-        run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
-        working-directory: path/to/Dockerfile
+        run: docker build ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
 
       - name: Tag Docker image
         run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
