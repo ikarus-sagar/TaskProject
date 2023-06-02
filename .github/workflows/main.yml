@@ -75,5 +75,6 @@ jobs:
       - name: Update ECS task definition
         run: |
           aws ecs register-task-definition --family Task_def \
-            --container-definitions '$(cat your-new-container-definition.json)' \
+            --cli-input-json your-new-container-definition.json \
             --region ${{ env.AWS_REGION }}
+        
