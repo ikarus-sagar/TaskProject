@@ -61,10 +61,6 @@ jobs:
       - name: Build Docker image
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
 
-      # - name: Tag Docker image
-      #   run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-      # - name: Push Docker image
-      #   run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
       - name: Tag Docker image
         run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
@@ -76,3 +72,8 @@ jobs:
         with:
           name: package
           path: dist
+      - name: Update ECS task definition
+        run: |
+          aws ecs register-task-definition --family Task_def \
+            --container-definitions '$(cat your-new-container-definition.json)' \
+            --region ${{ env.AWS_REGION }}
