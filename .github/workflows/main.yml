@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  build-and-test:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,14 +45,6 @@ jobs:
       - name: Generate coverage report
         run: coverage report --fail-under=80
 
-  build-and-publish-docker:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
-    steps:
       - name: Install Docker
         uses: docker/setup-buildx-action@v1
 
@@ -64,10 +56,10 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Docker login
-        run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
+        run: aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
       - name: Build Docker image
-        run: docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+        run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
 
       - name: Tag Docker image
         run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
@@ -75,13 +67,6 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
-  package-upload:
-    needs: build-and-publish-docker
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
       - name: Upload package
         uses: actions/upload-artifact@v2
         with:
