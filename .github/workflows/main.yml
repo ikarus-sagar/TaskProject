@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  ECR_REGISTRY: "822546254290.dkr.ecr.us-west-1.amazonaws.com/taskproject"
+  ECR_REPOSITORY: "taskproject"
+  AWS_REGION: "us-west-1"
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -40,11 +45,13 @@ jobs:
       - name: Generate coverage report
         run: coverage report --fail-under=80
 
-      - name: Install wheel package
-        run: pip install wheel
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v1
 
-      - name: Build package
-        run: python setup.py sdist bdist_wheel
+      - name: Build Docker image
+        run: |
+          docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Upload package
         uses: actions/upload-artifact@v2
