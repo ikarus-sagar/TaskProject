@@ -11,54 +11,59 @@ Actions:
     # Identifies the action. Do not modify this value.
     Identifier: aws/build@v1.0.0
 
-    # Specifies the source and/or artifacts to pass to the action as input.
-    Inputs:
-      # Optional
-      Sources:
-        - WorkflowSource # This specifies that the action requires this Workflow as a source
-
-    Outputs:
-      # Optional; Automatically discover reports for popular test frameworks
-      AutoDiscoverReports:
-        Enabled: true
-        # Use as prefix for the report files
-        ReportNamePrefix: rpt
-
-    # Defines the action's properties.
     Configuration:
       # Required - Steps are sequential instructions that run shell commands
-      Steps:
-        - Run: echo "Hello, World!"
-        - Run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" >> report.xml
-        - Run: echo "<testsuite tests=\"1\" name=\"TestAgentJunit\" >" >> report.xml
-        - Run: echo "<testcase classname=\"TestAgentJunit\" name=\"Dummy
-            Test\"/></testsuite>" >> report.xml
-  Test_e9:
-    # Identifies the action. Do not modify this value.
-    Identifier: aws/managed-test@v1.0.0
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    # Specifies the source and/or artifacts to pass to the action as input.
-    Inputs:
-      # Optional
-      Sources:
-        - WorkflowSource # This specifies that the action requires this Workflow as a source
+      - name: Create virtual environment
+        run: python -m venv venv
 
-    Outputs:
-      # Optional; Automatically discover reports for popular test frameworks
-      AutoDiscoverReports:
-        Enabled: true
-        # Use as prefix for the report files
-        ReportNamePrefix: rpt
+      - name: Activate virtual environment
+        run: source venv/bin/activate
 
-    # Defines the action's properties.
-    Configuration:
-      # Required - Steps are sequential instructions that run shell commands
-      Steps:
-        # use run-tests $FRAMEWORK to enable advanced testing features such as test case retries
-        # see info link in shell commands section for more details
-        - Run: run-tests -h
-        - Run: echo "Hello, World!"
-        - Run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" >> report.xml
-        - Run: echo "<testsuite tests=\"1\" name=\"TestAgentJunit\" >" >> report.xml
-        - Run: echo "<testcase classname=\"TestAgentJunit\" name=\"Dummy
-            Test\"/></testsuite>" >> report.xml
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: |
+          coverage run -m pytest
+
+      - name: Generate coverage report
+        run: coverage report --fail-under=80
+
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Docker login
+        run: aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
+
+      - name: Build Docker image
+        run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
+
+      - name: Tag Docker image
+        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Push Docker image
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Upload package
+        uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: dist
