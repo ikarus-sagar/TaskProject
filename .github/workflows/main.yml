@@ -60,7 +60,7 @@ jobs:
       
       - name: Delete old ECR image
         run: |
-          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageTag=822546254290.dkr.ecr.us-west-1.amazonaws.com/taskproject:latest
+          aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageTag="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest"
       
       - name: Build Docker image and tag with latest tag
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
