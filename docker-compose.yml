@@ -1,4 +1,4 @@
-$schema: "https://github.com/compose-spec/compose-spec/blob/master/schema/compose-spec.json",
+# $schema: "https://github.com/compose-spec/compose-spec/blob/master/schema/compose-spec.json",
 version: '3.10'
 services:
   app:
