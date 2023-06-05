@@ -126,6 +126,9 @@ jobs:
       statuses: write
     # Job steps
     steps:
+      - name: Directory
+        run: cd ..
+
       # Install Docker CLI
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v1
