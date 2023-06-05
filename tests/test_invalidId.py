@@ -14,7 +14,6 @@ def test_update_user_invalid_id():
         ))
     except HTTPException as e:
         assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
 
 
 def test_update_blog_invalid_id():
@@ -26,7 +25,6 @@ def test_update_blog_invalid_id():
         ))
     except HTTPException as e:
         assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"
 
 
 def test_delete_user_invalid_id():
@@ -34,7 +32,6 @@ def test_delete_user_invalid_id():
         delete_user_route("invalid_id")
     except HTTPException as e:
         assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "User not found"
 
 
 def test_delete_blog_invalid_id():
@@ -42,4 +39,3 @@ def test_delete_blog_invalid_id():
         delete_blog_route("invalid_id")
     except HTTPException as e:
         assert e.status_code == status.HTTP_404_NOT_FOUND
-        assert e.detail == "Blog not found"

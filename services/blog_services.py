@@ -23,14 +23,14 @@ def get_blogs(db: MongoClient = Depends(get_database)):
     blogs = list(blogs)
     if blogs:
         return blogs
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No blogs found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def get_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Getting blog")
     blog = blogs_collection.find_one({"id": blog_id})
     if blog:
         return blog
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def delete_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Deleting blog")
@@ -38,7 +38,7 @@ def delete_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     if blog:
         blogs_collection.delete_one({"id": blog_id})
         return {"message": "Blog deleted successfully"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def update_blog(blog_id: str, blog: BlogIn, db: MongoClient = Depends(get_database)):
     logger.info("Updating blog")
@@ -46,4 +46,4 @@ def update_blog(blog_id: str, blog: BlogIn, db: MongoClient = Depends(get_databa
     blog = blogs_collection.find_one_and_update({"id": blog_id}, {"$set": blog}, return_document=True)
     if blog:
         return blog
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
