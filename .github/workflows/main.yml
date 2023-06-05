@@ -54,7 +54,7 @@ jobs:
         run: pip install -r requirements.txt
 
   linting:
-    needs: install-dependencies
+    needs: [install-dependencies , setup-python]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -69,7 +69,7 @@ jobs:
           pylint --exit-zero
 
   test-coverage:
-    needs: install-dependencies
+    needs: [install-dependencies , setup-python]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -93,7 +93,7 @@ jobs:
         run: coverage xml
 
   sonarcloud-scan:
-    needs: [linting, test-coverage]
+    needs: [linting, test-coverage , setup-python , setup-node , install-dependencies] 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -108,7 +108,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-and-publish:
-    needs: [setup-node,sonarcloud-scan]
+    needs: [setup-node,sonarcloud-scan , test-coverage , linting , install-dependencies, setup-python]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
