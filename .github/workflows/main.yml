@@ -50,6 +50,7 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
 
@@ -62,6 +63,10 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+
+      - name: Install pylint
+        run: pip install pylint
+
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py')
@@ -76,6 +81,11 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+      
+      - name: Install pytest and coverage
+        run: |
+          pip install pytest
+          pip install coverage
 
       - name: Run tests with coverage
         run: coverage run -m pytest

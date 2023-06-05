@@ -6,8 +6,3 @@ pymongo[srv]
 pytest
 pyYAML
 docker-compose==1.29.2
-coverage
-# pylint
-# flake8
-# setuptools
-# wheel
