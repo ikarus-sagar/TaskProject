@@ -1,44 +1,73 @@
+# This is a basic workflow to help you get started with Actions
 name: Build, Test, and Publish Docker Image to Amazon ECR 
 
+# Controls when the action will run.
 on:
+  # Trigger the workflow on push or pull request
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+  # Configure the webhook for push events in the repository settings
+  # repository_dispatch:
 
+  
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 env:
+  # Set the host to the Amazon ECR registry URL for the region
   ECR_REGISTRY: "822546254290.dkr.ecr.us-west-1.amazonaws.com"
+  # Set the name of your ECR repository
   ECR_REPOSITORY: "taskproject"
+  # Set the AWS Region
   AWS_REGION: "us-west-1"
 
+# This workflow Jobs runs on Ubuntu
 jobs:
-  build-and-publish:
+  # Job Name 
+  build-and-test:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest 
+    # Job permissions 
     permissions:
       contents: read
       packages: write
-
+      id-token: write
+      pull-requests: write
+      statuses: write
+      
+    # Job steps
     steps:
-      - name: Checkout code repository 
+      # Checkout code repository
+      - name: Checkout code repository \
         uses: actions/checkout@v3
         with:
           submodules: true
           fetch-depth: 0
 
+      # Create virtual environment and activate it
       - name: Create virtual environment for Python
-        run: python -m venv venv
+        run: |
+          - python -m venv venv
+          - source venv/bin/activate
 
-      - name: Activate virtual environment for Python
-        run: source venv/bin/activate
-
+      # Setup Python 3.11
       - name: Set up Python 3.11
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'
 
+      
+      # Install dependencies for Python
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
-
+        
+      # Python linting with pylint and flake8
       # - name: Analysing the code with pylint
       #   run: |
       #     pylint $(git ls-files '*.py')
@@ -50,52 +79,122 @@ jobs:
       #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
       #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+
+      # Run tests with coverage
       - name: Run tests with coverage
         run: |
-          coverage run -m pytest
+          - coverage run -m pytest
 
+      # Generate coverage report and fail if coverage is below 80%
       - name: Generate coverage report and fail if coverage is below 80%
         run: coverage report --fail-under=80
 
+      # Generate coverage report in XML format
       - name: Generate coverage report in XML format
         run: coverage xml
 
+      # Run SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+          
+  # Job -2
+  build-and-publish:
+    needs: build-and-test
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Job permissions
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      pull-requests: write
+      statuses: write
+    # Job steps
+    steps:
+      # Install Docker CLI
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v1
 
+      # Configure AWS credentials for Docker
       - name: Configure AWS credentials for Docker 
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
+        
+      # Docker login to Amazon ECR registry 
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
       
+      # Delete old ECR image
       - name: Delete old ECR image
         run: |
           aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageDetails[].imageDigest' --output text | while read -r line; do aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest="$line"; done
 
-      
+      # Build Docker image and tagging with latest tag
       - name: Build Docker image and tag with latest tag
         run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest .
 
+      # Tag Docker image with commit hash
       - name: Tag Docker image with commit hash 
         run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
+      # Push Docker image with latest tag to Amazon ECR
       - name: Push Docker image with latest tag to Amazon ECR
         run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
 
+      # # Push Docker image with commit hash to Amazon ECR
+      # - name: Create an ECS task definition that specifies the Docker image and container configurations.
+      #   run: aws ecs register-task-definition --cli-input-json file://task-def.json
+
+      # # Create an ECS cluster and service that uses the task definition.
+      # - name: Configure the ECS cluster and task definition based on your application's requirements.
+      #   run: aws ecs create-cluster --cluster-name taskproject
+      
+      # # Create an ECS service that uses the task definition.
+      # - name: Create an ECS service that uses the task definition.
+      #   run: aws ecs create-service --cluster taskproject --service-name taskproject --cli-input-json file://service-def.json
+
+      # # Ensure that the ECS cluster and service are properly configured to handle the desired number of tasks and container instances.
+      # - name: Ensure that the ECS cluster and service are properly configured to handle the desired number of tasks and container instances.
+      #   run: aws ecs update-service --cluster taskproject --service taskproject --desired-count 1
+
+      # # Ensure that the ECS service is configured to use the latest version of the task definition.
+      # - name: Ensure that the ECS service is configured to use the latest version of the task definition.
+      #   run: aws ecs update-service --cluster taskproject --service taskproject --force-new-deployment
+
+      # # Ensure that the ECS service is configured to use the desired load balancer and target group.
+      # - name: Ensure that the ECS service is configured to use the desired load balancer and target group.
+      #   run: aws ecs update-service --cluster taskproject --service taskproject --load-balancers targetGroupArn=arn:aws:elasticloadbalancing:us-west-1:822546254290:targetgroup/taskproject/0e0b1b3b0b0b0b0b0b0b0b0b0b0b0b0b,containerName=taskproject,containerPort=80
+
+      # Create a release
+      - name: Create a release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      # Upload package to GitHub Artifacts
       - name: Upload package to GitHub Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: package
           path: dist
+
+      # Upload coverage report to GitHub Artifacts
+      - name: Upload coverage report to GitHub Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: coverage.xml
+      
       
