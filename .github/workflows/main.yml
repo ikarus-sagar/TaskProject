@@ -49,11 +49,11 @@ jobs:
           fetch-depth: 0
 
       # Create virtual environment and activate it
-      - name: Create virtual environment for Python
-        run: python -m venv venv
+      # - name: Create virtual environment for Python
+      #   run: python -m venv venv
 
-      - name: Activate virtual environment for Python
-        run: source venv/bin/activate
+      # - name: Activate virtual environment for Python
+      #   run: source venv/bin/activate
 
       # Setup Python 3.11
       - name: Set up Python 3.11
@@ -66,10 +66,13 @@ jobs:
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
         
-      # Python linting with pylint and flake8
-      # - name: Analysing the code with pylint
-      #   run: |
-      #     pylint $(git ls-files '*.py')
+      # Python linting with pylint
+      - name: Analysing the code with pylint
+        run: |
+          pylint $(git ls-files '*.py')
+          pylint --exit-zero
+      
+      
 
       # - name: Lint with flake8
       #   run: |
