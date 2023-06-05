@@ -64,6 +64,7 @@ jobs:
           fetch-depth: 0
       - name: Analysing the code with pylint
         run: |
+          pip install pylint
           pylint $(git ls-files '*.py')
           pylint --exit-zero
 
@@ -76,6 +77,11 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
+
+      - name: Install pytest and coverage
+        run: |
+          pip install pytest
+          pip install coverage
 
       - name: Run tests with coverage
         run: coverage run -m pytest
