@@ -83,8 +83,7 @@ jobs:
 
       # Run tests with coverage
       - name: Run tests with coverage
-        run: |
-          - coverage run -m pytest
+        run: coverage run -m pytest
 
       # Generate coverage report and fail if coverage is below 80%
       - name: Generate coverage report and fail if coverage is below 80%
