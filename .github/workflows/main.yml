@@ -43,7 +43,7 @@ jobs:
         run: coverage report --fail-under=80
 
       - name: Generate coverage report in XML format
-        run: coverage xml
+        run: coverage xml -o coverage.xml --omit=venv/*,tests/* 
 
   setup-node:
     runs-on: ubuntu-latest

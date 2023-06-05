@@ -25,14 +25,14 @@ def get_users(db: MongoClient = Depends(get_database)):
     users = list(users)
     if users:
         return users
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def get_user(user_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Getting user")
     user = users_collection.find_one({"id": user_id})
     if user:
         return user
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def delete_user(user_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Deleting user")
@@ -42,7 +42,7 @@ def delete_user(user_id: str, db: MongoClient = Depends(get_database)):
         return {
             "message": "User deleted successfully"
         }
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 def update_user(user_id: str, user: UserIn, db: MongoClient = Depends(get_database)):
     logger.info("Updating user")
@@ -51,4 +51,4 @@ def update_user(user_id: str, user: UserIn, db: MongoClient = Depends(get_databa
     user = users_collection.find_one_and_update({"id": user_id}, {"$set": user}, return_document=True)
     if user:
         return user["id"]
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
