@@ -15,7 +15,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  checkout:
+  setup-python:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -23,10 +23,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-
-  setup-python:
-    runs-on: ubuntu-latest
-    steps:
       - name: Set up Python 3.11
         uses: actions/setup-python@v2
         with:
@@ -35,31 +31,52 @@ jobs:
   setup-node:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: Set up Node.js 16.x
         uses: actions/setup-node@v2
         with:
           node-version: '16.x'
 
   install-dependencies:
-    needs: [checkout, setup-python]
+    needs: setup-python
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
 
   linting:
-    needs: [checkout, setup-python]
+    needs: setup-python
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py')
           pylint --exit-zero
 
   test-coverage:
-    needs: [checkout, setup-python]
+    needs: setup-python
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
       - name: Run tests with coverage
         run: coverage run -m pytest
 
@@ -70,9 +87,14 @@ jobs:
         run: coverage xml
 
   sonarcloud-scan:
-    needs: [checkout, setup-python]
+    needs: setup-python
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -80,9 +102,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-and-publish:
-    needs: [checkout, setup-node, install-dependencies, linting, test-coverage, sonarcloud-scan]
+    needs: [setup-node, install-dependencies, linting, test-coverage, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v2
 
