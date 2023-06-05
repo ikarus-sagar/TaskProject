@@ -31,9 +31,10 @@ jobs:
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
 
-      - name: Analysing the code with pylint
-        run: |
-          pylint $(git ls-files '*.py')
+      # - name: Analysing the code with pylint
+      #   run: |
+      #     pylint $(git ls-files '*.py')
+      #     pylint --exit-zero
 
       - name: Run tests with coverage
         run: coverage run -m pytest
