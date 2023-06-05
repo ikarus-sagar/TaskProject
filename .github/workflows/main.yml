@@ -52,9 +52,10 @@ jobs:
 
       # Create virtual environment and activate it
       - name: Create virtual environment for Python
-        run: |
-          - python -m venv venv
-          - source venv/bin/activate
+        run: python -m venv venv
+
+      - name: Activate virtual environment for Python
+        run: source venv/bin/activate
 
       # Setup Python 3.11
       - name: Set up Python 3.11
@@ -99,6 +100,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Run SonarQube Scan
+      # - name: SonarQube Scan
+      #   uses: sonarsource/sonarqube-scan-action@master
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      #     SONAR_PROJECT_NAME: ${{ secrets.SONAR_PROJECT_NAME }}
+      #     SONAR_PROJECT_VERSION: ${{ secrets.SONAR_PROJECT_VERSION }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
           
   # Job -2
   build-and-publish:
