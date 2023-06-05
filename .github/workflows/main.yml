@@ -15,7 +15,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  setup-python:
+  setup-python-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -28,6 +28,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies for Python
+        run: pip install -r requirements.txt
+
+      - name: Analysing the code with pylint
+        run: |
+          pylint $(git ls-files '*.py')
+          pylint --exit-zero
+
+      - name: Run tests with coverage
+        run: coverage run -m pytest
+
+      - name: Generate coverage report and fail if coverage is below 80%
+        run: coverage report --fail-under=80
+
+      - name: Generate coverage report in XML format
+        run: coverage xml
+
   setup-node:
     runs-on: ubuntu-latest
     steps:
@@ -39,61 +56,10 @@ jobs:
       - name: Set up Node.js 16.x
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
-
-  install-dependencies:
-    needs: setup-python
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          fetch-depth: 0
-      - name: Install dependencies for Python
-        run: pip install -r requirements.txt
-
-  linting:
-    needs: [install-dependencies , setup-python]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          fetch-depth: 0
-      - name: Analysing the code with pylint
-        run: |
-          pip install pylint
-          pylint $(git ls-files '*.py')
-          pylint --exit-zero
-
-  test-coverage:
-    needs: [install-dependencies , setup-python]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-          fetch-depth: 0
-
-      - name: Install pytest and coverage
-        run: |
-          pip install pytest
-          pip install coverage
-
-      - name: Run tests with coverage
-        run: coverage run -m pytest
-
-      - name: Generate coverage report and fail if coverage is below 80%
-        run: coverage report --fail-under=80
-
-      - name: Generate coverage report in XML format
-        run: coverage xml
+          node-version: '16.x'    
 
   sonarcloud-scan:
-    needs: [linting, test-coverage , setup-python , setup-node , install-dependencies] 
+    needs: [setup-python-and-test , setup-node] 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -108,7 +74,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-and-publish:
-    needs: [setup-node,sonarcloud-scan , test-coverage , linting , install-dependencies, setup-python]
+    needs: [setup-node,sonarcloud-scan,setup-python-and-test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
