@@ -25,12 +25,6 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: Create virtual environment for Python
         run: python -m venv venv
 
@@ -62,6 +56,15 @@ jobs:
 
       - name: Generate coverage report and fail if coverage is below 80%
         run: coverage report --fail-under=80
+
+      - name: Generate coverage report in XML format
+        run: coverage xml
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v1
