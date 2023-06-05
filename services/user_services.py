@@ -40,7 +40,7 @@ def delete_user(user_id: str, db: MongoClient = Depends(get_database)):
     if user:
         users_collection.delete_one({"id": user_id})
         return {
-            "message": "User with id: {} deleted successfully".format(user_id)
+            "message": "User deleted successfully"
         }
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 

@@ -124,10 +124,11 @@ def test_delete_users():
     users = get_users_route()
     for user in users:
         if user["name"] == "test":
-            delete_user_route(user["id"])
-            assert 1 == 1
+            deleted_user = delete_user_route(user["id"])
+            assert deleted_user["message"]=="User deleted successfully"
+        
     blogs = get_blogs_route()
     for blog in blogs:
         if blog["title"] == "test":
-            delete_blog_route(blog["id"])
-            assert 1 == 1
+            deleted_blog = delete_blog_route(blog["id"])
+            assert deleted_blog["message"] == "Blog deleted successfully"
