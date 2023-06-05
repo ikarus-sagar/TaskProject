@@ -126,8 +126,12 @@ jobs:
       statuses: write
     # Job steps
     steps:
-      - name: Directory
-        run: cd ..
+      # Checkout code repository
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
 
       # Install Docker CLI
       - name: Install Docker CLI
