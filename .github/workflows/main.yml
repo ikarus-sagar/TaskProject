@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  setup-python:
+  setup-python-and-testing:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,8 +25,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
-      
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        run: coverage run -m pytest
+
+      - name: Generate coverage report and fail if coverage is below 80%
+        run: coverage report --fail-under=40
+
+      - name: Generate coverage report in XML format
+        run: coverage xml -o coverage.xml --omit=venv/*,tests/*  
 
   setup-node:
     runs-on: ubuntu-latest
@@ -56,29 +67,9 @@ jobs:
           pip install flake8
           flake8 $(git ls-files '*.py')
 
-  Testing:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run tests with coverage
-        run: coverage run -m pytest
-
-      - name: Generate coverage report and fail if coverage is below 80%
-        run: coverage report --fail-under=40
-
-      - name: Generate coverage report in XML format
-        run: coverage xml -o coverage.xml --omit=venv/*,tests/*  
-
+      
   sonarcloud-scan:
-    needs: [setup-python, setup-node, Lint, Testing] 
+    needs: [setup-python-and-testing, setup-node, Lint] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -97,7 +88,7 @@ jobs:
             -Dsonar.python.coverage.reportPaths=coverage.xml
 
   build-and-publish:
-    needs: [setup-python, setup-node, Lint, Testing, sonarcloud-scan]
+    needs: [setup-python-and-testing, setup-node, Lint, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
