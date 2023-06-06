@@ -84,12 +84,6 @@ jobs:
   
       - name: Generate coverage report in XML format
         run: coverage xml -o coverage.xml --omit=venv/*,tests/*
-  
-      - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-report
-          path: coverage.xml  
       
   sonarcloud-scan:
     needs: [testing, setup-node, Linting] 
@@ -100,12 +94,6 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-
-      - name: Download coverage report from testing job
-        uses: actions/download-artifact@v2
-        with:
-          name: coverage-report
-          path: coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -136,9 +124,9 @@ jobs:
         run: docker build --file Dockerfile --tag myimage:latest .
         # Replace 'myimage' with the desired image name
   
-      - name: Tag Docker image with commit hash
-        run: docker tag myimage:latest myimage:${{ github.sha }}
-        # Replace 'myimage' with the same image name used in the previous step
+      - name: Push Docker image with latest tag to local Docker registry
+        run: docker push myimage:latest
+        # Replace 'myimage' with the same image name used in the build job
   
   publish:
     needs: build
@@ -158,7 +146,4 @@ jobs:
         run: docker push myimage:latest
         # Replace 'myimage' with the same image name used in the build job
   
-      - name: Push Docker image with commit hash tag to Amazon ECR
-        run: docker push myimage:${{ github.sha }}
-        # Replace 'myimage' with the same image name used in the build job
   
