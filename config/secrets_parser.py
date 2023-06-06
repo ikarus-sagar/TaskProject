@@ -24,4 +24,3 @@ def get_blogs_collection():
 def get_users_collection():
     db = get_database()
     return db["users"]
-

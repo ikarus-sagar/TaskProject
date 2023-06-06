@@ -1,8 +1,7 @@
 from models.blog_models import BlogIn
 from models.user_models import UserIn
-from routes.blog_routes import get_blog_route , get_blogs_route , create_blog_route , delete_blog_route
-from routes.user_routes import get_user_route , get_users_route , create_user_route , delete_user_route , update_user_route
-
+from routes.blog_routes import get_blog_route, get_blogs_route, create_blog_route, delete_blog_route
+from routes.user_routes import get_user_route, get_users_route, create_user_route, delete_user_route, update_user_route
 
 def test_user():
     user = UserIn(
@@ -109,7 +108,6 @@ def test_blogs():
         for blog in blogs:
             created_blog = create_blog_route(blog)
             created_blog_ids.append(created_blog["id"])
-
         blogs = get_blogs_route()
         for blog in blogs:
             if blog["title"] in ["test1", "test2"]:
@@ -125,8 +123,7 @@ def test_delete_users():
     for user in users:
         if user["name"] == "test":
             deleted_user = delete_user_route(user["id"])
-            assert deleted_user["message"]=="User deleted successfully"
-        
+            assert deleted_user["message"]=="User deleted successfully"        
     blogs = get_blogs_route()
     for blog in blogs:
         if blog["title"] == "test":

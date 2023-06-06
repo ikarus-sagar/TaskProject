@@ -7,7 +7,4 @@ app = FastAPI()
 app.include_router(blog_routes.router)
 app.include_router(user_routes.router)
 
-app.mount("/", 
-          StaticFiles(directory="client_build", 
-                      html=True), 
-          name="frontend")
+app.mount("/", StaticFiles(directory="client_build", html=True), name="frontend")
