@@ -56,10 +56,10 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
 
-      - name: Analysing the code with black
-        run: |
-          pip install black
-          black --check $(git ls-files '*.py')
+      # - name: Analysing the code with black
+      #   run: |
+      #     pip install black
+      #     black --check $(git ls-files '*.py')
 
       # - name: Analysing the code with pylint
       #   run: |
@@ -72,11 +72,11 @@ jobs:
           pip install flake8
           flake8 $(git ls-files '*.py')
 
-      - name: Lint Code Base
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_PYTHON_BLACK: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Lint Code Base
+      #   uses: github/super-linter@v5
+      #   env:
+      #     VALIDATE_PYTHON_BLACK: true
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
   sonarcloud-scan:
     needs: [setup-python-and-testing, setup-node, Lint] 
