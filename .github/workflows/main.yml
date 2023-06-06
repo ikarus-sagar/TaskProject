@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: '16.x'   
 
-  Linting:
+  Linting-python:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
@@ -63,9 +63,39 @@ jobs:
       #     VALIDATE_PYTHON_BLACK: true
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  testing:
+  Linting-node:
     runs-on: ubuntu-latest
-    needs: [setup-python , Linting]
+    needs: [setup-node]
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+
+      - name: Analysing the code with eslint
+        run: |
+          npm install eslint
+          npx eslint $(git ls-files '*.js')
+
+      - name: Analysing the code with stylelint
+        run: |
+          npm install stylelint
+          npx stylelint $(git ls-files '*.css')
+
+      - name: Analysing the code with prettier
+        run: |
+          npm install prettier
+          npx prettier --check $(git ls-files '*.js')
+
+      # - name: Lint Code Base
+      #   uses: github/super-linter@v5
+      #   env:
+      #     VALIDATE_JAVASCRIPT_ES: true
+      #     VALIDATE_JAVASCRIPT_STANDARD: true
+      #     VALIDATE_CSS_ES: true
+      #     VALIDATE_CSS_STANDARD: true
+
+  testing-backend:
+    runs-on: ubuntu-latest
+    needs: [setup-python , Linting-python]
     permissions:
       contents: read
       packages: write
@@ -86,8 +116,27 @@ jobs:
       - name: Generate coverage report in XML format
         run: coverage xml -o coverage.xml --omit=venv/*,tests/*
 
+  build-and-test-frontend:
+    runs-on: ubuntu-latest
+    needs: [Linting-node]
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build client
+        run: |
+          npm run build
+        
+      - name: Test client
+        run: |
+          npm run test
+
   sonarcloud-scan:
-    needs: [testing, setup-node, Linting] 
+    needs: [testing-backend, build-and-test-frontend] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -112,7 +161,7 @@ jobs:
       #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build-and-publish:
-    needs: [testing, sonarcloud-scan]
+    needs: [testing-backend, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
