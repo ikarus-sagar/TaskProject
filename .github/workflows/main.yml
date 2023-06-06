@@ -26,9 +26,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies for Python
-        run: pip install -r requirements.txt
-
   setup-node:
     runs-on: ubuntu-latest
     steps:
@@ -48,6 +45,7 @@ jobs:
 
       # - name: Analysing the code with pylint
       #   run: |
+      #     pip install pylint
       #     pylint $(git ls-files '*.py')
       #     pylint --exit-zero
 
