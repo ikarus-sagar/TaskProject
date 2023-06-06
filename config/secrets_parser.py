@@ -1,14 +1,14 @@
 import yaml
 import pymongo
 
-with open("config/secrets.yml", 'r') as stream:
+with open("config/secrets.yml", "r") as stream:
     secrets = yaml.safe_load(stream)
 
-mongodb_host = secrets['mongodb']['host']
-mongodb_port = secrets['mongodb']['port']
-mongodb_username = secrets['mongodb']['username']
-mongodb_password = secrets['mongodb']['password']
-mongodb_database = secrets['mongodb']['database']
+mongodb_host = secrets["mongodb"]["host"]
+mongodb_port = secrets["mongodb"]["port"]
+mongodb_username = secrets["mongodb"]["username"]
+mongodb_password = secrets["mongodb"]["password"]
+mongodb_database = secrets["mongodb"]["database"]
 
 
 def get_database():

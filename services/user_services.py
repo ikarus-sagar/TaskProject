@@ -8,6 +8,7 @@ from utils.hashing import Hash
 
 users_collection = get_users_collection()
 
+
 def create_user(user: UserIn, db: MongoClient = Depends(get_database)):
     logger.info("Creating user")
     user = user.dict()
@@ -19,6 +20,7 @@ def create_user(user: UserIn, db: MongoClient = Depends(get_database)):
         "id": user["id"],
     }
 
+
 def get_users(db: MongoClient = Depends(get_database)):
     logger.info("Getting All users")
     users = users_collection.find()
@@ -27,6 +29,7 @@ def get_users(db: MongoClient = Depends(get_database)):
         return users
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
+
 def get_user(user_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Getting user")
     user = users_collection.find_one({"id": user_id})
@@ -34,21 +37,23 @@ def get_user(user_id: str, db: MongoClient = Depends(get_database)):
         return user
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
+
 def delete_user(user_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Deleting user")
     user = users_collection.find_one({"id": user_id})
     if user:
         users_collection.delete_one({"id": user_id})
-        return {
-            "message": "User deleted successfully"
-        }
+        return {"message": "User deleted successfully"}
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
 
 def update_user(user_id: str, user: UserIn, db: MongoClient = Depends(get_database)):
     logger.info("Updating user")
     user = user.dict()
     user["password"] = Hash.bcrypt(user["password"])
-    user = users_collection.find_one_and_update({"id": user_id}, {"$set": user}, return_document=True)
+    user = users_collection.find_one_and_update(
+        {"id": user_id}, {"$set": user}, return_document=True
+    )
     if user:
         return user["id"]
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

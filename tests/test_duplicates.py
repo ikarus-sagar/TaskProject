@@ -1,15 +1,12 @@
 from fastapi import HTTPException, status
-from routes.blog_routes import create_blog_route , delete_blog_route
-from routes.user_routes import create_user_route , delete_user_route
+from routes.blog_routes import create_blog_route, delete_blog_route
+from routes.user_routes import create_user_route, delete_user_route
 from models.blog_models import BlogIn
 from models.user_models import UserIn
 
+
 def test_create_duplicate_user():
-    user = UserIn(
-        name="test",
-        email="test@gmail.com",
-        password="test123"
-    )
+    user = UserIn(name="test", email="test@gmail.com", password="test123")
     try:
         created_user = create_user_route(user)
     except HTTPException as e:
@@ -20,11 +17,7 @@ def test_create_duplicate_user():
 
 
 def test_create_duplicate_blog():
-    blog = BlogIn(
-        title="test",
-        content="test",
-        creator="test"
-    )
+    blog = BlogIn(title="test", content="test", creator="test")
     try:
         created_blog = create_blog_route(blog)
     except HTTPException as e:

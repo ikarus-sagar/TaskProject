@@ -1,14 +1,22 @@
 from models.blog_models import BlogIn
 from models.user_models import UserIn
-from routes.blog_routes import get_blog_route, get_blogs_route, create_blog_route, delete_blog_route
-from routes.user_routes import get_user_route, get_users_route, create_user_route, delete_user_route, update_user_route
+from routes.blog_routes import (
+    get_blog_route,
+    get_blogs_route,
+    create_blog_route,
+    delete_blog_route,
+)
+from routes.user_routes import (
+    get_user_route,
+    get_users_route,
+    create_user_route,
+    delete_user_route,
+    update_user_route,
+)
+
 
 def test_user():
-    user = UserIn(
-        name="test",
-        email="test@gmail.com",
-        password="test123"
-    )
+    user = UserIn(name="test", email="test@gmail.com", password="test123")
     created_user = create_user_route(user)
     user_id = created_user["id"]
     try:
@@ -22,16 +30,8 @@ def test_user():
 
 def test_users():
     users = [
-        UserIn(
-            name="test1",
-            email="test1@gmail.com",
-            password="test123"
-        ),
-        UserIn(
-            name="test2",
-            email="test2@gmail.com",
-            password="test123"
-        )
+        UserIn(name="test1", email="test1@gmail.com", password="test123"),
+        UserIn(name="test2", email="test2@gmail.com", password="test123"),
     ]
     created_user_ids = []
     try:
@@ -50,16 +50,8 @@ def test_users():
 
 
 def test_update_user():
-    user = UserIn(
-        name="test",
-        email="test@gmail.com",
-        password="test123"
-    )
-    new_user = UserIn(
-        name="test1",
-        email="test1@gmail.com",
-        password="test123"
-    )
+    user = UserIn(name="test", email="test@gmail.com", password="test123")
+    new_user = UserIn(name="test1", email="test1@gmail.com", password="test123")
     created_user = create_user_route(user)
     user_id = created_user["id"]
     try:
@@ -74,11 +66,7 @@ def test_update_user():
 
 
 def test_blog():
-    blog = BlogIn(
-        title="test",
-        content="test",
-        creator="test"
-    )
+    blog = BlogIn(title="test", content="test", creator="test")
     created_blog = create_blog_route(blog)
     blog_id = created_blog["id"]
     try:
@@ -92,16 +80,8 @@ def test_blog():
 
 def test_blogs():
     blogs = [
-        BlogIn(
-            title="test1",
-            content="test1",
-            creator="test1"
-        ),
-        BlogIn(
-            title="test2",
-            content="test2",
-            creator="test2"
-        )
+        BlogIn(title="test1", content="test1", creator="test1"),
+        BlogIn(title="test2", content="test2", creator="test2"),
     ]
     created_blog_ids = []
     try:
@@ -123,7 +103,7 @@ def test_delete_users():
     for user in users:
         if user["name"] == "test":
             deleted_user = delete_user_route(user["id"])
-            assert deleted_user["message"]=="User deleted successfully"        
+            assert deleted_user["message"] == "User deleted successfully"
     blogs = get_blogs_route()
     for blog in blogs:
         if blog["title"] == "test":
