@@ -136,11 +136,11 @@ jobs:
         run: docker build --file Dockerfile --tag myimage:latest .
         # Replace 'myimage' with the desired image name
   
-      - name: archive artifact
+      - name: upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: myimage
-          path: ./myimage.tar.gz
+          path: myimage.tar.gz
   
   publish:
     needs: [build, sonarcloud-scan]
@@ -153,7 +153,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: myimage
-          path: ./myimage.tar.gz
+          path: myimage.tar.gz
   
       - name: Load Docker image from archive
         run: docker load -i myimage.tar.gz
