@@ -125,7 +125,7 @@ jobs:
         # Replace 'myimage' with the desired image name
   
       - name: archive artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: myimage
           path: myimage.tar.gz
