@@ -78,7 +78,6 @@ jobs:
   
       - name: Run tests with coverage
         run: coverage run --source . --omit '/usr/*' -m pytest
-        
   
       - name: Generate coverage report and fail if coverage is below 80%
         run: coverage report --fail-under=80
