@@ -73,7 +73,7 @@ jobs:
           flake8 $(git ls-files '*.py')
 
       - name: Lint Code Base
-        uses: github/super-linter@v4
+        uses: github/super-linter@v5
         env:
           VALIDATE_PYTHON_BLACK: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
