@@ -128,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: myimage
-          path: myimage.tar.gz
+          path: ./myimage.tar.gz
 
       
   
@@ -143,7 +143,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: myimage
-          path: myimage.tar.gz
+          path: ./myimage.tar.gz
 
       - name: Load Docker image from archive
         run: docker load -i myimage.tar.gz
