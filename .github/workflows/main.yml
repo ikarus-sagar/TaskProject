@@ -134,6 +134,9 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
 
+      - name: Move to client directory
+        run: cd client
+
       - name: Install dependencies
         run: |
           npm install
