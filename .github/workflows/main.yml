@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -15,7 +12,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  setup-python-and-test:
+  setup-python-and-testing:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,24 +20,15 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies for Python
-        run: pip install -r requirements.txt
-
-      # - name: Analysing the code with pylint
-      #   run: |
-      #     pylint $(git ls-files '*.py')
-      #     pylint --exit-zero
-
-      - name: Analysing the code with flake8
+      - name: Install dependencies
         run: |
-          flake8 $(git ls-files '*.py')
+          pip install -r requirements.txt
 
       - name: Run tests with coverage
         run: coverage run -m pytest
@@ -49,22 +37,39 @@ jobs:
         run: coverage report --fail-under=80
 
       - name: Generate coverage report in XML format
-        run: coverage xml -o coverage.xml --omit=venv/*,tests/* 
+        run: coverage xml -o coverage.xml --omit=venv/*,tests/*  
 
   setup-node:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
       - name: Set up Node.js 16.x
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'    
+          node-version: '16.x'   
 
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+
+      # - name: Analysing the code with pylint
+      #   run: |
+      #     pip install pylint
+      #     pylint $(git ls-files '*.py')
+      #     pylint --exit-zero
+
+      - name: Analysing the code with flake8
+        run: |
+          pip install flake8
+          flake8 $(git ls-files '*.py')
+
+      
   sonarcloud-scan:
-    needs: [setup-python-and-test , setup-node] 
+    needs: [setup-python-and-testing, setup-node, Lint] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -72,8 +77,7 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -90,13 +94,11 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build-and-publish:
-    needs: [setup-node,sonarcloud-scan,setup-python-and-test]
+    needs: [setup-python-and-testing, setup-node, Lint, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
           
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v2
