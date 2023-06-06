@@ -21,7 +21,6 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
         with:
-          submodules: true
           fetch-depth: 0
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
@@ -51,7 +50,6 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
         with:
-          submodules: true
           fetch-depth: 0
       - name: Set up Node.js 16.x
         uses: actions/setup-node@v3
@@ -65,7 +63,6 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
         with:
-          submodules: true
           fetch-depth: 0
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -83,7 +80,6 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
         with:
-          submodules: true
           fetch-depth: 0
           
       - name: Install Docker CLI
