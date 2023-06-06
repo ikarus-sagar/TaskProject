@@ -84,6 +84,12 @@ jobs:
   
       - name: Generate coverage report in XML format
         run: coverage xml -o coverage.xml --omit=venv/*,tests/*
+
+      - name: archive artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: ./coverage.xml
       
   sonarcloud-scan:
     needs: [testing, setup-node, Linting] 
@@ -94,6 +100,12 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage
+          path: ./coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
