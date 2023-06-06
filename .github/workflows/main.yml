@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-west-1"
 
 jobs:
-  setup-python-and-test:
+  setup-python:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,24 +30,6 @@ jobs:
       - name: Install dependencies for Python
         run: pip install -r requirements.txt
 
-      # - name: Analysing the code with pylint
-      #   run: |
-      #     pylint $(git ls-files '*.py')
-      #     pylint --exit-zero
-
-      - name: Analysing the code with flake8
-        run: |
-          flake8 $(git ls-files '*.py')
-
-      - name: Run tests with coverage
-        run: coverage run -m pytest
-
-      - name: Generate coverage report and fail if coverage is below 80%
-        run: coverage report --fail-under=80
-
-      - name: Generate coverage report in XML format
-        run: coverage xml -o coverage.xml --omit=venv/*,tests/* 
-
   setup-node:
     runs-on: ubuntu-latest
     steps:
@@ -58,10 +40,46 @@ jobs:
       - name: Set up Node.js 16.x
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'    
+          node-version: '16.x'   
+
+  Lint:
+    needs: [setup-python]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # - name: Analysing the code with pylint
+      #   run: |
+      #     pylint $(git ls-files '*.py')
+      #     pylint --exit-zero
+
+      - name: Analysing the code with flake8
+        run: |
+          flake8 $(git ls-files '*.py')
+
+  Testing:
+    needs: [setup-python]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run tests with coverage
+        run: coverage run -m pytest
+
+      - name: Generate coverage report and fail if coverage is below 80%
+        run: coverage report --fail-under=80
+
+      - name: Generate coverage report in XML format
+        run: coverage xml -o coverage.xml --omit=venv/*,tests/*  
 
   sonarcloud-scan:
-    needs: [setup-python-and-test , setup-node] 
+    needs: [setup-python, setup-node, Lint, Testing] 
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -81,7 +99,7 @@ jobs:
             -Dsonar.python.coverage.reportPaths=coverage.xml
 
   build-and-publish:
-    needs: [setup-node,sonarcloud-scan,setup-python-and-test]
+    needs: [setup-python, setup-node, Lint, Testing, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
