@@ -67,6 +67,14 @@ jobs:
           pip install flake8
           flake8 $(git ls-files '*.py')
 
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_PYTHON_BLACK: true
+          VALIDATE_HTML: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
   sonarcloud-scan:
     needs: [setup-python-and-testing, setup-node, Lint] 
