@@ -124,14 +124,30 @@ jobs:
         run: docker build --file Dockerfile --tag myimage:latest .
         # Replace 'myimage' with the desired image name
   
-      - name: Push Docker image with latest tag to local Docker registry
-        run: docker push myimage:latest
-        # Replace 'myimage' with the same image name used in the build job
+      - name: archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: myimage
+          path: myimage.tar.gz
+
+      
   
   publish:
-    needs: build
+    needs: [build, sonarcloud-scan]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: myimage
+          path: myimage.tar.gz
+
+      - name: Load Docker image from archive
+        run: docker load -i myimage.tar.gz
+
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
         with:
