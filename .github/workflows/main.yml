@@ -124,7 +124,7 @@ jobs:
       #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   build:
-    needs: [testing, sonarcloud-scan]
+    needs: setup-python
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
