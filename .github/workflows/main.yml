@@ -34,7 +34,7 @@ jobs:
         run: coverage run -m pytest
 
       - name: Generate coverage report and fail if coverage is below 80%
-        run: coverage report --fail-under=40
+        run: coverage report --fail-under=80
 
       - name: Generate coverage report in XML format
         run: coverage xml -o coverage.xml --omit=venv/*,tests/*  
