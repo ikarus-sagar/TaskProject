@@ -16,12 +16,12 @@ def test_create_duplicate_user():
         delete_user_route(created_user["id"])
 
 
-# def test_create_duplicate_blog():
-#     blog = BlogIn(title="test", content="test", creator="test")
-#     try:
-#         created_blog = create_blog_route(blog)
-#     except HTTPException as e:
-#         assert e.status_code == status.HTTP_400_BAD_REQUEST
-#         assert e.detail == "Blog with the same title already exists"
-#     finally:
-#         delete_blog_route(created_blog["id"])
+def test_create_duplicate_blog():
+    blog = BlogIn(title="test", content="test", creator="test")
+    try:
+        created_blog = create_blog_route(blog)
+    except HTTPException as e:
+        assert e.status_code == status.HTTP_400_BAD_REQUEST
+        assert e.detail == "Blog with the same title already exists"
+    finally:
+        delete_blog_route(created_blog["id"])
