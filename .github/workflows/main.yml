@@ -35,34 +35,6 @@ jobs:
         with:
           node-version: '16.x'   
 
-  Linting-python:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code repository
-        uses: actions/checkout@v3
-
-      - name: Analysing the code with black
-        run: |
-          pip install black
-          black --check $(git ls-files '*.py')
-
-      # - name: Analysing the code with pylint
-      #   run: |
-      #     pip install pylint
-      #     pylint $(git ls-files '*.py')
-      #     pylint --exit-zero
-
-      - name: Analysing the code with flake8
-        run: |
-          pip install flake8
-          flake8 $(git ls-files '*.py')
-
-      # - name: Lint Code Base
-      #   uses: github/super-linter@v5
-      #   env:
-      #     VALIDATE_PYTHON_BLACK: true
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   Linting-node:
     runs-on: ubuntu-latest
     steps:
@@ -103,6 +75,34 @@ jobs:
       #     VALIDATE_JAVASCRIPT_STANDARD: true
       #     VALIDATE_CSS_ES: true
       #     VALIDATE_CSS_STANDARD: true
+
+  Linting-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v3
+
+      # - name: Analysing the code with black
+      #   run: |
+      #     pip install black
+      #     black --check $(git ls-files '*.py')
+
+      # - name: Analysing the code with pylint
+      #   run: |
+      #     pip install pylint
+      #     pylint $(git ls-files '*.py')
+      #     pylint --exit-zero
+
+      # - name: Analysing the code with flake8
+      #   run: |
+      #     pip install flake8
+      #     flake8 $(git ls-files '*.py')
+
+      - name: Lint Code Base
+        uses: github/super-linter@v5
+        env:
+          VALIDATE_PYTHON_BLACK: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   testing-backend:
     runs-on: ubuntu-latest
