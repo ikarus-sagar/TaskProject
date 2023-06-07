@@ -157,7 +157,7 @@ jobs:
           npm run test -- --passWithNoTests
         working-directory: ./client
 
-  sonarcloud-scan:
+  sonarQube-scan:
     needs: [testing-backend, build-and-test-frontend] 
     runs-on: ubuntu-latest
     permissions:
@@ -191,7 +191,7 @@ jobs:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-and-publish:
-    needs: [testing-backend, sonarcloud-scan]
+    needs: [testing-backend, sonarQube-scan]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code repository
