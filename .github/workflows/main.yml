@@ -49,21 +49,25 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
+        working-directory: ./client
 
       - name: Analysing the code with eslint
         run: |
           npm install eslint
           npx eslint $(git ls-files '*.js')
+        working-directory: ./client
 
       - name: Analysing the code with stylelint
         run: |
           npm install stylelint
           npx stylelint $(git ls-files '*.css')
+        working-directory: ./client
 
       - name: Analysing the code with prettier
         run: |
           npm install prettier
           npx prettier --check $(git ls-files '*.js')
+        working-directory: ./client
 
       # - name: Lint Code Base
       #   uses: github/super-linter@v5
@@ -90,16 +94,16 @@ jobs:
       #     pylint $(git ls-files '*.py')
       #     pylint --exit-zero
 
-      # - name: Analysing the code with flake8
-      #   run: |
-      #     pip install flake8
-      #     flake8 $(git ls-files '*.py')
+      - name: Analysing the code with flake8
+        run: |
+          pip install flake8
+          flake8 $(git ls-files '*.py')
 
-      - name: Lint Code Base
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_PYTHON_BLACK: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Lint Code Base
+      #   uses: github/super-linter@v5
+      #   env:
+      #     VALIDATE_PYTHON_BLACK: true
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   testing-backend:
     runs-on: ubuntu-latest
@@ -131,20 +135,20 @@ jobs:
       - name: Checkout code repository
         uses: actions/checkout@v3
 
-      - name: Move to client directory
-        run: cd client
-
       - name: Install dependencies
         run: |
           npm install
+        working-directory: ./client
 
       - name: Build client
         run: |
           npm run build
+        working-directory: ./client
         
       - name: Test client
         run: |
           npm run test
+        working-directory: ./client
 
   sonarcloud-scan:
     needs: [testing-backend, build-and-test-frontend] 
