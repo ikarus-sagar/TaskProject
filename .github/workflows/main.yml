@@ -90,6 +90,7 @@ jobs:
       - name: Analysing the code with black
         run: |
           pip install black
+          black .
           black --check $(git ls-files '*.py')
 
       # - name: Analysing the code with pylint
