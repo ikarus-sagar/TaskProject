@@ -60,12 +60,14 @@ jobs:
       - name: Analysing the code with stylelint
         run: |
           npm install stylelint
+          npm install --save-dev stylelint-config-standard
           npx stylelint $(git ls-files '*.css')
         working-directory: ./client
 
       - name: Analysing the code with prettier
         run: |
           npm install prettier
+          npx prettier --write $(git ls-files '*.js')
           npx prettier --check $(git ls-files '*.js')
         working-directory: ./client
 
