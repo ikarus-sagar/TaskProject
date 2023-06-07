@@ -43,13 +43,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x' 
-
-      - name: Move to client directory
-        run: cd client
+      # - name: Move to client directory
+      #   run: cd client
 
       - name: Install dependencies
         run: |
