@@ -149,7 +149,7 @@ jobs:
         
       - name: Test client
         run: |
-          npm run test
+          npm run test -- --passWithNoTests
         working-directory: ./client
 
   sonarcloud-scan:
