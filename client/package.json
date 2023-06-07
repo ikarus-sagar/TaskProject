@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rmdir /s /q ..\\client_build && move build ..\\client_build",
+    "build": "react-scripts build && rm -rf ../client_build && mv build ../client_build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
