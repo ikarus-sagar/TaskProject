@@ -218,6 +218,10 @@ jobs:
       - name: Set version as environment variable
         run: |
           version=$(aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]')
+          if [ -z "$version" ]
+          then
+            version="0.0.0"
+          fi
           IFS='.' read -r -a version_parts <<< "$version"
           major=${version_parts[0]}
           minor=${version_parts[1]}
