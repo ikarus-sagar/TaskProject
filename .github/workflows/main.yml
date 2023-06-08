@@ -215,6 +215,14 @@ jobs:
           updated_version="${major}.${minor}.${patch}"
           echo "VERSION=${updated_version}" >> $GITHUB_ENV
 
+      - name: Configure AWS credentials for Docker
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+  
+
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
