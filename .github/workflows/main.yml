@@ -214,6 +214,7 @@ jobs:
           patch=$((patch + 1))
           updated_version="${major}.${minor}.${patch}"
           echo "$updated_version" > version.txt
+          echo "VERSION=$updated_version" >> $GITHUB_ENV
       
 
       - name: Configure AWS credentials for Docker
