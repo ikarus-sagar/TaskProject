@@ -215,19 +215,21 @@ jobs:
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
-      - name: Set version as environment variable
-        run: |
-          version=$(aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]')
-          if [ $version == "null" ]; then
-            version="0.0.0"
-          fi
-          IFS='.' read -r -a version_parts <<< "$version"
-          major=${version_parts[0]}
-          minor=${version_parts[1]}
-          patch=${version_parts[2]}
-          patch=$((patch + 1))
-          updated_version="${major}.${minor}.${patch}"
-          echo "VERSION=${updated_version}" >> $GITHUB_ENV
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Create a GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
 
       # - name: Delete old ECR image
       #   run: |
@@ -235,14 +237,14 @@ jobs:
 
       - name: Build Docker image and tag with latest tag
         run: |
-          docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}} .
+          docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }} .
 
       - name: Tag Docker image with commit hash
-        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
+        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
 
       - name: Push Docker image with latest tag to Amazon ECR
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
 
       - name: Push Docker image with commit hash tag to Amazon ECR
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
 
