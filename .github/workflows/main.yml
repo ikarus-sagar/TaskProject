@@ -10,7 +10,7 @@ env:
   ECR_REGISTRY: "822546254290.dkr.ecr.us-west-1.amazonaws.com"
   ECR_REPOSITORY: "taskproject"
   AWS_REGION: "us-west-1"
-  IMAGE_NAME: "latest"
+  SONAR_PROJECT_KEY: "TaskProject"
 
 jobs:
   setup-python:
@@ -179,11 +179,13 @@ jobs:
       #     args: >
       #       -Dsonar.python.coverage.reportPaths=coverage.xml
 
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # - name: SonarQube Scan
+      #   uses: sonarsource/sonarqube-scan-action@master
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       # - uses: sonarsource/sonarqube-quality-gate-action@master
@@ -201,28 +203,35 @@ jobs:
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v2
 
-      - name: Configure AWS credentials for Docker
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set version as environment variable
+        run: |
+          version=${{ env.VERSION }}
+          IFS='.' read -r -a version_parts <<< "$version"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+          patch=$((patch + 1))
+          updated_version="${major}.${minor}.${patch}"
+          echo "VERSION=${updated_version}" >> $GITHUB_ENV
 
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
 
-      - name: Delete old ECR image
-        run: |
-          aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageDetails[].imageDigest' --output text | while read -r line; do aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest="$line"; done
+      # - name: Delete old ECR image
+      #   run: |
+      #     aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageDetails[].imageDigest' --output text | while read -r line; do aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest="$line"; done
 
       - name: Build Docker image and tag with latest tag
-        run: docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.IMAGE_NAME}} .
+        run: |
+          docker build --file Dockerfile --tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}} .
 
       - name: Tag Docker image with commit hash
-        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.IMAGE_NAME}} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.IMAGE_NAME}}
+        run: docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
 
       - name: Push Docker image with latest tag to Amazon ECR
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.IMAGE_NAME}}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
 
       - name: Push Docker image with commit hash tag to Amazon ECR
-        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.IMAGE_NAME}}
+        run: docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{env.VERSION}}
+
