@@ -11,7 +11,6 @@ env:
   ECR_REPOSITORY: "taskproject"
   AWS_REGION: "us-west-1"
   SONAR_PROJECT_KEY: "TaskProject"
-  VERSION: "1.0.0"
 
 jobs:
   setup-python:
@@ -207,14 +206,14 @@ jobs:
 
       - name: Set version as environment variable
         run: |
-          version=${{ env.VERSION }}
+          version=$(cat version.txt)
           IFS='.' read -r -a version_parts <<< "$version"
           major=${version_parts[0]}
           minor=${version_parts[1]}
           patch=${version_parts[2]}
           patch=$((patch + 1))
           updated_version="${major}.${minor}.${patch}"
-          echo "VERSION=${updated_version}" >> $GITHUB_ENV
+          echo "$updated_version" > version.txt
       
 
       - name: Configure AWS credentials for Docker
