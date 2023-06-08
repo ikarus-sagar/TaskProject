@@ -202,19 +202,6 @@ jobs:
           
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v2
-
-
-      - name: Set version as environment variable
-        run: |
-          version=$(cat version.txt)
-          IFS='.' read -r -a version_parts <<< "$version"
-          major=${version_parts[0]}
-          minor=${version_parts[1]}
-          patch=${version_parts[2]}
-          patch=$((patch + 1))
-          updated_version="${major}.${minor}.${patch}"
-          echo "$updated_version" > version.txt
-          echo "VERSION=$updated_version" >> $GITHUB_ENV
       
 
       - name: Configure AWS credentials for Docker
@@ -227,6 +214,22 @@ jobs:
 
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}
+          
+
+      - name: Set version as environment variable
+        run: |
+          version=aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]'
+          if [ -z "$image_name" ]; then
+            version="0.0.0"
+            exit 1
+          fi
+          IFS='.' read -r -a version_parts <<< "$version"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+          patch=$((patch + 1))
+          updated_version="${major}.${minor}.${patch}"
+          echo "VERSION=${updated_version}" >> $GITHUB_ENV
 
       # - name: Delete old ECR image
       #   run: |
