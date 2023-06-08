@@ -196,6 +196,9 @@ jobs:
   build-and-publish:
     needs: [testing-backend, sonarQube-scan]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
