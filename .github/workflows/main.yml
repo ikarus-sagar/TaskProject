@@ -207,16 +207,16 @@ jobs:
       - name: Set version as environment variable
         run: |
           version=${{ env.VERSION }}
-          IFS='.' read -r -a version_parts <<< "$version"
-          major=${version_parts[0]}
-          minor=${version_parts[1]}
-          patch=${version_parts[2]}
+          IFS='_' read -r -a version_parts <<< "$version"
+          major=${version_parts[1]}
+          minor=${version_parts[2]}
+          patch=${version_parts[3]}
           patch=$((patch + 1))
           updated_version="${major}.${minor}.${patch}"
           echo "VERSION=${updated_version}" >> $GITHUB_ENV
 
       - name: Configure AWS credentials for Docker
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
