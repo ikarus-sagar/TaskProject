@@ -45,18 +45,18 @@ jobs:
         id: black-check
         run: |
           pip install black
-          black --check . || echo "Black check failed, but continuing..."
+          result=$(black --check . && echo "success" || echo "failure")
+          echo "BLACK_CHECK_RESULT=$result" >> $GITHUB_ENV
 
       - name: perform black formatting and remove unused imports with autoflake
-        if: steps.black-check.outcome == 'failure'
+        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
-          pip install black
           black .
           pip install autoflake
           autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place .
   
       - name: Add changes to git and push to remote branch 
-        if: steps.black-check.outcome == 'failure'
+        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
           git add .
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -65,7 +65,7 @@ jobs:
           git push origin ${{env.BRANCH_NAME}}-black-formatting
       
       - name: Create pull request
-        if: steps.black-check.outcome == 'failure'
+        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.G_TOKEN }}
