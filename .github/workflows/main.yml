@@ -10,7 +10,7 @@ env:
   ECR_REGISTRY: "822546254290.dkr.ecr.us-west-1.amazonaws.com"
   ECR_REPOSITORY: "taskproject"
   AWS_REGION: "us-west-1"
-  SONAR_PROJECT_KEY: "TaskProject"
+  SONAR_PROJECT_KEY: "Test"
 
 jobs:
   setup-python:
@@ -179,12 +179,12 @@ jobs:
       #     args: >
       #       -Dsonar.python.coverage.reportPaths=coverage.xml
 
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarqube-scan-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #     SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
 
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
