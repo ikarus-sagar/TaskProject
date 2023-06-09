@@ -59,8 +59,8 @@ jobs:
       - name: Add changes to git and push to remote branch 
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
-          git config --local user.email "sagar.gupta@ikarus3d.com"
-          git config --local user.name "ikarus-sagar"
+          git config --local user.email ${{ secrets.G_TOKEN }}
+          git config --local user.name ${{ github.actor }}
           git add .
           git commit -m "Format code with black and remove unused imports with autoflake"
           git push origin ${{env.BRANCH_NAME}}-black-formatting
