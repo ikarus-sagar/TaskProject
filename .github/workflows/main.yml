@@ -184,6 +184,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          LC_ALL: "ru_RU.UTF-8"
 
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
