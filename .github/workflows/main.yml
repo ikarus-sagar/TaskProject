@@ -213,19 +213,19 @@ jobs:
           name: coverage-report
           path: coverage-report
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          LC_ALL: "en_US.UTF-8"
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-            -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-            -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     LC_ALL: "en_US.UTF-8"
+      #   with:
+      #     projectBaseDir: .
+      #     args: >
+      #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+      #       -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+      #       -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
 
       # - name: SonarCloud Scan
       #   uses: SonarSource/sonarcloud-github-action@master
@@ -276,16 +276,19 @@ jobs:
 
       - name: Build Docker image and tag with latest tag
         run: |
-          docker build --file Dockerfile --tag ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }} .
+          docker build --file Dockerfile --tag latest .
 
       - name: Tag Docker image with commit hash
-        run: docker tag ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }} ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+        run: |
+          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+
 
       - name: Push Docker image with latest tag to Amazon ECR
-        run: docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+        run: |
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Push Docker image with commit hash tag to Amazon ECR
-        run: docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
 
       # - name: Delete old ECR image
       #   run: |
