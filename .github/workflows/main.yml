@@ -38,7 +38,11 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v3
-  
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ secrets.G_TOKEN }}
+          ssh-strict: true
+
       - name: Create black-formatting branch
         run: git checkout -b ${{env.BRANCH_NAME}}-black-formatting
   
@@ -55,6 +59,7 @@ jobs:
           black .
           pip install autoflake
           autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place .
+
 
       - name: setup GitHub CLI
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
