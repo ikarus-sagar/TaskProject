@@ -53,6 +53,7 @@ def delete_blog_route(blog_id: str):
 def update_blog_route(blog_id: str, blog: BlogIn):
     return update_blog(blog_id, blog)
 
+
 @router.get(
     "/blog/comments",
     response_model=List[BlogOut],
