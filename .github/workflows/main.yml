@@ -65,14 +65,10 @@ jobs:
         run: |
           git config --local user.email "sagar.gupta@ikarus3d.com"
           git config --local user.name ${{ github.actor }}
+          git pull origin master-black-formatting
           git add .
           git commit -m "Format code with black and remove unused imports with autoflake"
-          git push origin ${{env.BRANCH_NAME}}-black-formatting
-      
-      - name: Create pull request
-        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
-        run: |
-          gh pr create --title "Format code with black and remove unused imports with autoflake" --body "This PR was automatically created by GitHub Actions" --base ${{env.BRANCH_NAME}} --head ${{env.BRANCH_NAME}}-black-formatting --repo ${{ github.repository }}
+          git push origin ${{env.BRANCH_NAME}}-black-formatting --force
   
       - name: flake8 linting
         run: |
