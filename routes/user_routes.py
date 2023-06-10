@@ -37,11 +37,11 @@ def get_user_route(user_id: str):
     return get_user(user_id)
 
 
-@router.delete("/user/{user_id}", status_code=status.HTTP_202_ACCEPTED, tags=["users"])
-def delete_user_route(user_id: str):
-    return delete_user(user_id)
+# @router.delete("/user/{user_id}", status_code=status.HTTP_202_ACCEPTED, tags=["users"])
+# def delete_user_route(user_id: str):
+#     return delete_user(user_id)
 
 
-@router.put("/user/{user_id}", status_code=status.HTTP_200_OK, tags=["users"])
-def update_user_route(user_id: str, user: UserIn):
-    return update_user(user_id, user)
+# @router.put("/user/{user_id}", status_code=status.HTTP_200_OK, tags=["users"])
+# def update_user_route(user_id: str, user: UserIn):
+#     return update_user(user_id, user)
