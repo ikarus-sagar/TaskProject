@@ -63,12 +63,11 @@ jobs:
       - name: Add changes to git and push to remote branch 
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
+          git push --delete origin master-black-formatting || true
           git config --local user.email "sagar.gupta@ikarus3d.com"
           git config --local user.name ${{ github.actor }}
           git add .
           git commit -m "Format code with black and remove unused imports with autoflake"
-          git fetch origin master-black-formatting
-          git rebase origin/master-black-formatting
           git push origin ${{env.BRANCH_NAME}}-black-formatting --force
   
       - name: flake8 linting
