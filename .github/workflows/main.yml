@@ -67,15 +67,8 @@ jobs:
       
       - name: Create pull request
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.G_TOKEN }}
-          commit-message: Format code with black and remove unused imports with autoflake
-          title: Format code with black and remove unused imports with autoflake
-          body: This pull request was automatically created by the GitHub Action [black-formatting]
-          branch: ${{env.BRANCH_NAME}}-black-formatting
-          branch-suffix: timestamp
-          labels: black-formatting
+        run: |
+          gh pr create --title "Format code with black and remove unused imports with autoflake" --body "This PR was automatically created by GitHub Actions" --base ${{env.BRANCH_NAME}} --head ${{env.BRANCH_NAME}}-black-formatting --repo ${{ github.repository }}
   
       - name: flake8 linting
         run: |
