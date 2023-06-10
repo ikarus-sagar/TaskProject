@@ -59,13 +59,6 @@ jobs:
           black .
           pip install autoflake
           autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place .
-
-
-      - name: setup GitHub CLI
-        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
-        run: |
-          sudo apt install gh
-          gh --version
   
       - name: Add changes to git and push to remote branch 
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
@@ -79,7 +72,6 @@ jobs:
       - name: Create pull request
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
-          gh auth login --with-token ${{ secrets.G_TOKEN }}
           gh pr create --title "Format code with black and remove unused imports with autoflake" --body "This PR was automatically created by GitHub Actions" --base ${{env.BRANCH_NAME}} --head ${{env.BRANCH_NAME}}-black-formatting --repo ${{ github.repository }}
   
       - name: flake8 linting
