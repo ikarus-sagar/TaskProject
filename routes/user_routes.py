@@ -5,8 +5,6 @@ from services.user_services import (
     create_user,
     get_users,
     get_user,
-    delete_user,
-    update_user,
 )
 
 router = APIRouter()
