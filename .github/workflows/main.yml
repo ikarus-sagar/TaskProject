@@ -58,20 +58,16 @@ jobs:
           fi
 
       - name: perform black formatting and remove unused imports with autoflake
-        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
+        if: ${{ env.BLACK_CHECK_RESULT == 'failure' }}
         run: |
           black .
           pip install autoflake
           autoflake --remove-all-unused-imports --recursive --remove-unused-variables --in-place .
   
       - name: Add changes to git and push to remote branch 
-        if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
+        if: ${{ env.BLACK_CHECK_RESULT == 'failure' }}
         run: |
-          if git rev-parse --quiet --verify origin/master-black-formatting; then
-            git push --delete origin master-black-formatting || true
-          else
-            echo "Branch 'master-black-formatting' doesn't exist. Skipping deletion."
-          fi
+          git push --delete origin master-black-formatting || true
           git config --local user.email "sagar.gupta@ikarus3d.com"
           git config --local user.name ${{ github.actor }}
           git add .
