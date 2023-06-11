@@ -244,6 +244,19 @@ jobs:
           
       - name: Install Docker CLI
         uses: docker/setup-buildx-action@v2
+
+      - name: Read version from file
+        id: read_version
+        run: |
+          echo "::set-output name=version::$(cat version.txt)"
+
+      - name: Commit version changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add version.txt
+          git commit -m "Bump version to ${{ steps.read_version.outputs.version }}"
+          git push
       
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
@@ -254,21 +267,15 @@ jobs:
 
       - name: Docker login to Amazon ECR registry
         run: aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v5
-        with:
-          github_token: ${{ secrets.G_TOKEN }}
         
       - name: Create a GitHub release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
         with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          tag_name: ${{ steps.read_version.outputs.new_tag }}
+          release_name: Release ${{ steps.read_version.outputs.new_tag }}
+          body: ${{ steps.read_version.outputs.changelog }}
 
       - name: Build Docker image and tag with latest tag
         run: |
@@ -276,18 +283,29 @@ jobs:
 
       - name: Tag Docker image with commit hash
         run: |
-          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.new_tag }}
           docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
 
       - name: Push Docker image with latest tag to Amazon ECR
+        id: build-image
         run: |
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.tag_version.outputs.new_tag }}
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.new_tag }}
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+          echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest" >> $GITHUB_OUTPUT
 
-
-      # - name: Delete old ECR image
-      #   run: |
-      #     aws ecr describe-images --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageDetails[].imageDigest' --output text | while read -r line; do aws ecr batch-delete-image --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest="$line"; done
-    
-
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+          container-name: ${{ secrets.ECS_CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+      
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
