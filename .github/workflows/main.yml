@@ -67,7 +67,11 @@ jobs:
       - name: Add changes to git and push to remote branch 
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
         run: |
-          git push --delete origin master-black-formatting || true
+          if git rev-parse --quiet --verify origin/master-black-formatting; then
+            git push --delete origin master-black-formatting || true
+          else
+            echo "Branch 'master-black-formatting' doesn't exist. Skipping deletion."
+          fi
           git config --local user.email "sagar.gupta@ikarus3d.com"
           git config --local user.name ${{ github.actor }}
           git add .
