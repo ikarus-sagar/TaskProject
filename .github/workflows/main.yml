@@ -254,7 +254,7 @@ jobs:
       - name: Read version from file
         id: read_version
         run: |
-          echo "::set-output name=version::$(cat version.txt)"
+          echo "::set-output new_tag=version::$(cat version.txt)"
       
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
