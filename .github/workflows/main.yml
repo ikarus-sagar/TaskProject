@@ -215,19 +215,19 @@ jobs:
           name: coverage-report
           path: coverage-report
 
-      # - name: SonarQube Scan
-      #   uses: SonarSource/sonarqube-scan-action@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #     LC_ALL: "en_US.UTF-8"
-      #   with:
-      #     projectBaseDir: .
-      #     args: >
-      #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-      #       -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-      #       -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          LC_ALL: "en_US.UTF-8"
+        with:
+          projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+            -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+            -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
 
       # - name: SonarCloud Scan
       #   uses: SonarSource/sonarcloud-github-action@master
@@ -254,7 +254,8 @@ jobs:
       - name: Read version from file
         id: read_version
         run: |
-          echo "::set-output name=version::$(cat version.txt)"
+          version=$(cat .version)
+          echo "::set-output name=version::$version"
       
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
