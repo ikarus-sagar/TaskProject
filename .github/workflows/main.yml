@@ -1,8 +1,10 @@
 name: Build, Test, and Publish Docker Image to Amazon ECR
 
 on:
-  # push event to master branch
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
