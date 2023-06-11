@@ -255,14 +255,6 @@ jobs:
         id: read_version
         run: |
           echo "::set-output name=version::$(cat version.txt)"
-
-      - name: Commit version changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add version.txt
-          git commit -m "Bump version to ${{ steps.read_version.outputs.version }}"
-          git push
       
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
