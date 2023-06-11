@@ -1,6 +1,7 @@
 name: Build, Test, and Publish Docker Image to Amazon ECR
 
 on:
+  # push event to master branch
   push:
     branches:
       - main
@@ -50,8 +51,11 @@ jobs:
         id: black-check
         run: |
           pip install black
-          result=$(black --check . && echo "success" || echo "failure")
-          echo "BLACK_CHECK_RESULT=$result" >> $GITHUB_ENV
+          if black --check .; then
+            echo "BLACK_CHECK_RESULT=success" >> $GITHUB_ENV
+          else
+            echo "BLACK_CHECK_RESULT=failure" >> $GITHUB_ENV
+          fi
 
       - name: perform black formatting and remove unused imports with autoflake
         if: ${{ env.BLACK_CHECK_RESULT }}" == "failure"
