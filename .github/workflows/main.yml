@@ -215,19 +215,19 @@ jobs:
           name: coverage-report
           path: coverage-report
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          LC_ALL: "en_US.UTF-8"
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-            -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
-            -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     LC_ALL: "en_US.UTF-8"
+      #   with:
+      #     projectBaseDir: .
+      #     args: >
+      #       -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+      #       -Dsonar.projectName=${{ secrets.SONAR_PROJECT_KEY }}-${{ env.BRANCH_NAME }}
+      #       -Dsonar.python.coverage.reportPaths=coverage-report/coverage.xml
 
       # - name: SonarCloud Scan
       #   uses: SonarSource/sonarcloud-github-action@master
@@ -254,7 +254,7 @@ jobs:
       - name: Read version from file
         id: read_version
         run: |
-          echo "::set-output new_tag=version::$(cat version.txt)"
+          echo "::set-output name=version::$(cat version.txt)"
       
       - name: Configure AWS credentials for Docker
         uses: aws-actions/configure-aws-credentials@v2
@@ -271,8 +271,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
         with:
-          tag_name: ${{ steps.read_version.outputs.new_tag }}
-          release_name: Release ${{ steps.read_version.outputs.new_tag }}
+          tag_name: ${{ steps.read_version.outputs.version }}
+          release_name: Release ${{ steps.read_version.outputs.version }}
           body: ${{ steps.read_version.outputs.changelog }}
 
       - name: Build Docker image and tag with latest tag
@@ -281,14 +281,14 @@ jobs:
 
       - name: Tag Docker image with commit hash
         run: |
-          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.new_tag }}
+          docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.version }}
           docker tag latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
 
       - name: Push Docker image with latest tag to Amazon ECR
         id: build-image
         run: |
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.new_tag }}
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:${{ steps.read_version.outputs.version }}
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
           echo "image=${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest" >> $GITHUB_OUTPUT
 
