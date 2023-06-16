@@ -1,8 +1,9 @@
-import logging,sys
+import logging
+import logging.config
+import yaml
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+with open("config/logging.yml", "r") as f:
+    logging.config.dictConfig(yaml.safe_load(f.read()))
 
-logger = logging.getLogger('my_app')
+logger = logging.getLogger(__name__)
+logger.info("Logging configured")

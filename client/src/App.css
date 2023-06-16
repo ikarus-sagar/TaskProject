@@ -1,11 +1,10 @@
-.App {
+.app {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
-  margin: 20px;
+  margin: 20px auto; /* Update margin property to include "auto" */
   width: 80%;
-  margin: 0 auto;
 }
 
 .main {
@@ -30,10 +29,9 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 10px;
-
 }
 
-.form input{
+.form input {
   width: 100%;
   padding: 6px 10px;
   font-size: 14px;
@@ -43,7 +41,7 @@
   margin-bottom: 10px;
 }
 
-.btn{
+.btn {
   width: 100%;
   padding: 6px 10px;
   font-size: 14px;
@@ -55,7 +53,8 @@
   border-radius: 5px;
   margin: 10px 0;
 }
-.btn:hover{
+
+.btn:hover {
   background-color: #0069d9;
 }
 
@@ -80,8 +79,8 @@
   margin-bottom: 10px;
 }
 
-@media (max-width: 768px) {
-  .App {
+@media (max-width>=768px) {
+  .app {
     flex-direction: column;
     width: 100%;
   }
@@ -92,3 +91,4 @@
     margin-bottom: 20px;
   }
 }
+

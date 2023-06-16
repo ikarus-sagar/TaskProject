@@ -7,30 +7,34 @@ from config.logging import logger
 
 blogs_collection = get_blogs_collection()
 
+
 def create_blog(blog: BlogIn, db: MongoClient = Depends(get_database)):
     logger.info("Creating blog")
-    blog_data = blog.dict()
-    blog_data["id"] = str(ObjectId())
-    blogs_collection.insert_one(blog_data)
+    blog = blog.dict()
+    blog["id"] = str(ObjectId())
+    blogs_collection.insert_one(blog)
     return {
         "message": "Blog created successfully",
-        "id": blog_data["id"],
+        "id": blog["id"],
     }
 
+
 def get_blogs(db: MongoClient = Depends(get_database)):
-    logger.info("Getting all blogs")
+    logger.info("Getting All blogs")
     blogs = blogs_collection.find()
     blogs = list(blogs)
     if blogs:
         return blogs
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No blogs found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
 
 def get_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Getting blog")
     blog = blogs_collection.find_one({"id": blog_id})
     if blog:
         return blog
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
 
 def delete_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     logger.info("Deleting blog")
@@ -38,12 +42,15 @@ def delete_blog(blog_id: str, db: MongoClient = Depends(get_database)):
     if blog:
         blogs_collection.delete_one({"id": blog_id})
         return {"message": "Blog deleted successfully"}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
 
 def update_blog(blog_id: str, blog: BlogIn, db: MongoClient = Depends(get_database)):
     logger.info("Updating blog")
-    blog_data = blog.dict()
-    blog = blogs_collection.find_one_and_update({"id": blog_id}, {"$set": blog_data}, return_document=True)
+    blog = blog.dict()
+    blog = blogs_collection.find_one_and_update(
+        {"id": blog_id}, {"$set": blog}, return_document=True
+    )
     if blog:
         return blog
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
